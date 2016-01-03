@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent">
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <EditText
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/repo_add_dialog_name"
+            android:hint="@string/add_repo_dialog_name_hint"
+            android:paddingTop="16dp"
+            android:paddingBottom="16dp"
+            android:layout_weight="3"/>
+
+        <Switch
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/add_repo_dialog_clone_switch"
+            android:id="@+id/repo_add_dialog_clone"
+            />
+    </LinearLayout>
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/repo_add_dialog_cloneURL"
+        android:hint="@string/add_repo_dialog_cloneURL_hint"
+        android:inputType="textUri"
+        android:visibility="gone"/>
+
+</LinearLayout>

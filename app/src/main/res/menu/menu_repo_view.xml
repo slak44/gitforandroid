@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".activities.RepoViewActivity">
+
+    <item android:id="@+id/action_push"
+          android:title="@string/menu_action_push"
+          android:icon="@drawable/white_ic_push_24dp"
+          android:orderInCategory="100"
+          app:showAsAction="ifRoom" />
+
+    <item android:id="@+id/action_pull"
+          android:title="@string/menu_action_pull"
+          android:icon="@drawable/white_ic_pull_24dp"
+          android:orderInCategory="101"
+          app:showAsAction="ifRoom" />
+
+    <item android:id="@+id/action_settings"
+          android:title="@string/action_settings"
+          android:orderInCategory="100"
+          app:showAsAction="never" />
+</menu>

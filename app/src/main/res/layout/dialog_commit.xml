@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content">
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/dialog_commit_message"
+        android:layout_gravity="center_horizontal"
+        android:hint="@string/commit_dialog_message_hint"
+        />
+
+    <Switch
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/commit_dialog_substitute_switch"
+        android:id="@+id/dialog_commit_substitute"
+        android:layout_gravity="center"/>
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="textPersonName"
+        android:ems="10"
+        android:id="@+id/dialog_commit_name"
+        android:hint="@string/commit_dialog_su_name_hint"
+        android:visibility="gone"/>
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="textEmailAddress"
+        android:ems="10"
+        android:id="@+id/dialog_commit_email"
+        android:hint="@string/commit_dialog_su_email_hint"
+        android:visibility="gone"/>
+
+</LinearLayout>

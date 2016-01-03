@@ -1,0 +1,21 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".activities.RepoViewActivity">
+
+    <item android:id="@+id/action_stage"
+        android:title="@string/menu_action_stage"
+        android:icon="@drawable/white_ic_add_24dp"
+        android:orderInCategory="100"
+        app:showAsAction="ifRoom" />
+    <item android:id="@+id/action_unstage"
+        android:title="@string/menu_action_unstage"
+        android:icon="@drawable/white_ic_remove_24dp"
+        android:orderInCategory="101"
+        app:showAsAction="ifRoom" />
+    <item android:id="@+id/action_delete"
+        android:title="@string/menu_action_delete"
+        android:icon="@drawable/white_ic_delete_24dp"
+        android:orderInCategory="102"
+        app:showAsAction="ifRoom" />
+</menu>
