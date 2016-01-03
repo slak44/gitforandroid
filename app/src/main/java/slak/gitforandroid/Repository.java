@@ -60,8 +60,8 @@ public class Repository {
     AsyncGitTask init = new AsyncGitTask(callback) {
       @Override
       public void safelyDoInBackground() throws Exception {
-        if (alreadyExists)
-          throw new WrongRepositoryStateException("Failed to init: Repository " + name + " already exists");
+        if (alreadyExists) throw new WrongRepositoryStateException(
+            "Failed to init: Repository " + name + " already exists");
         git.getRepository().create();
       }
     };
@@ -73,8 +73,8 @@ public class Repository {
     AsyncGitTask clone = new AsyncGitTask(callback) {
       @Override
       public void safelyDoInBackground() throws Exception {
-        if (alreadyExists)
-          throw new WrongRepositoryStateException("Failed to clone: Repository " + name + " already exists");
+        if (alreadyExists) throw new WrongRepositoryStateException(
+            "Failed to clone: Repository " + name + " already exists");
         CloneCommand clCom = new CloneCommand();
         clCom.setCloneAllBranches(true);
         clCom.setDirectory(thisRepo);
@@ -86,10 +86,16 @@ public class Repository {
     alreadyExists = true;
   }
 
-  public void gitAdd(ArrayList<String> filePatterns) throws GitAPIException, IOException {
-    AddCommand aCom = git.add();
-    for (String pattern : filePatterns) aCom.addFilepattern(pattern);
-    aCom.call();
+  public void gitAdd(final ArrayList<String> filePatterns, AsyncGitTask.AsyncTaskCallback callback) {
+    AsyncGitTask add = new AsyncGitTask(callback) {
+      @Override
+      public void safelyDoInBackground() throws Exception {
+        AddCommand aCom = git.add();
+        for (String pattern : filePatterns) aCom.addFilepattern(pattern);
+        aCom.call();
+      }
+    };
+    add.execute();
   }
 
   public void gitCommit(
