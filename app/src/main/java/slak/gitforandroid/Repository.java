@@ -56,10 +56,6 @@ public class Repository {
     }
   }
 
-  public File getRepoFolder() {
-    return thisRepo;
-  }
-
   public void gitInit() throws GitAPIException, IOException {
     if (alreadyExists)
       throw new WrongRepositoryStateException("Failed to init: Repository " + name + " already exists");
@@ -67,22 +63,17 @@ public class Repository {
     alreadyExists = true;
   }
 
-  public void gitClone(final String uri) throws GitAPIException, RuntimeException {
-    if (alreadyExists)
-      throw new WrongRepositoryStateException("Failed to clone: Repository " + name + " already exists");
-    AsyncGitTask clone = new AsyncGitTask() {
+  public void gitClone(final String uri, AsyncGitTask.AsyncTaskCallback callback) {
+    AsyncGitTask clone = new AsyncGitTask(callback) {
       @Override
       public void safelyDoInBackground() throws Exception {
+        if (alreadyExists)
+          throw new WrongRepositoryStateException("Failed to clone: Repository " + name + " already exists");
         CloneCommand clCom = new CloneCommand();
         clCom.setCloneAllBranches(true);
         clCom.setDirectory(thisRepo);
         clCom.setURI(uri);
         clCom.call();
-      }
-
-      @Override
-      protected void onPostExecute(Integer integer) {
-        if (getException() == null) return;
       }
     };
     clone.execute();
@@ -95,92 +86,68 @@ public class Repository {
     aCom.call();
   }
 
-  private class AsyncCommitTask extends AsyncTask<String, Integer, Integer> {
-    public GitAPIException ex;
-    private PersonIdent author;
-    private PersonIdent committer;
-    private String message;
-
-    AsyncCommitTask(PersonIdent author, PersonIdent committer, String message) {
-      this.author = author;
-      this.committer = committer;
-      this.message = message;
-    }
-
-    @Override
-    // The return value is the status code: non-0 is trouble
-    protected Integer doInBackground(String... params) {
-      try {
-        git.commit().setAuthor(author).setCommitter(committer).setMessage(message).call();
-      } catch (GitAPIException gitEx) {
-        this.ex = gitEx;
-        return 1;
-      }
-      return 0;
-    }
-  }
-
-  public void gitCommit(PersonIdent author, PersonIdent committer, String message) throws RuntimeException {
+  public void gitCommit(
+      final PersonIdent author,
+      final PersonIdent committer,
+      final String message,
+      AsyncGitTask.AsyncTaskCallback callback
+  ) {
     SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-    PersonIdent stored = new PersonIdent(
+    final PersonIdent stored = new PersonIdent(
         prefs.getString("git_name", ""), prefs.getString("git_email", ""));
-    if (author == null) author = stored;
-    if (committer == null) committer = stored;
-    AsyncCommitTask commitTask = new AsyncCommitTask(author, committer, message);
-    commitTask.execute();
-    try {
-      if (commitTask.get() == 1) throw commitTask.ex;
-    } catch (Exception ex) {
-      throw new RuntimeException("Exception while committing", ex);
-    }
+    AsyncGitTask commit = new AsyncGitTask(callback) {
+      @Override
+      public void safelyDoInBackground() throws Exception {
+        git.commit()
+            .setAuthor(author == null ? stored : author)
+            .setCommitter(committer == null ? stored : committer)
+            .setMessage(message)
+            .call();
+      }
+    };
+    commit.execute();
   }
 
-  public void gitCommit(PersonIdent committer, String message) throws RuntimeException {
-    gitCommit(committer, committer, message);
+  public void gitCommit(
+      PersonIdent committer,
+      String message,
+      AsyncGitTask.AsyncTaskCallback callback
+  ) {
+    gitCommit(committer, committer, message, callback);
   }
 
-  public void gitCommit(String name, String email, String message) throws RuntimeException {
+  public void gitCommit(
+      String name,
+      String email,
+      String message,
+      AsyncGitTask.AsyncTaskCallback callback
+  ) {
     PersonIdent pi;
     if (name == null || email == null) pi = null;
     else pi = new PersonIdent(name, email);
-    gitCommit(pi, pi, message);
+    gitCommit(pi, pi, message, callback);
   }
 
-  private class AsyncPushTask extends AsyncTask<String, Integer, Integer> {
-    public GitAPIException ex;
-    private String remote;
-    private String password;
-
-    AsyncPushTask(String remote, String password) {
-      this.remote = remote;
-      this.password = password;
-    }
-
-    @Override
-    // The return value is the status code: non-0 is trouble
-    protected Integer doInBackground(String... params) {
-      SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-      UsernamePasswordCredentialsProvider upcp = new UsernamePasswordCredentialsProvider(
-          prefs.getString("git_username", ""),
-          password);
-      try {
+  public void gitPush(
+      final String remote,
+      final String password,
+      AsyncGitTask.AsyncTaskCallback callback
+  ) {
+    AsyncGitTask push = new AsyncGitTask(callback) {
+      @Override
+      public void safelyDoInBackground() throws Exception {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        UsernamePasswordCredentialsProvider upcp = new UsernamePasswordCredentialsProvider(
+            prefs.getString("git_username", ""),
+            password);
         git.push().setRemote(remote).setCredentialsProvider(upcp).setPushAll().call();
-      } catch (GitAPIException gitEx) {
-        this.ex = gitEx;
-        return 1;
       }
-      return 0;
-    }
+    };
+    push.execute();
   }
 
-  public void gitPush(String remote, String password) throws RuntimeException {
-    AsyncPushTask pushTask = new AsyncPushTask(remote, password);
-    pushTask.execute();
-    try {
-      if (pushTask.get() == 1) throw pushTask.ex;
-    } catch (Exception ex) {
-      throw new RuntimeException("Exception while pushing", ex);
-    }
+  public File getRepoFolder() {
+    return thisRepo;
   }
 
   public static File getRepoDirectory(Context currentActivity) {
@@ -190,7 +157,6 @@ public class Repository {
   }
 
   public static boolean isAvailable() {
-    if (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())) return true;
-    else return false;
+    return Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState());
   }
 }

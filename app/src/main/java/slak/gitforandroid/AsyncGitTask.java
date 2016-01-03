@@ -2,7 +2,7 @@ package slak.gitforandroid;
 
 import android.os.AsyncTask;
 
-public class AsyncGitTask extends AsyncTask<String, Integer, Integer> {
+public abstract class AsyncGitTask extends AsyncTask<String, Integer, Integer> {
   private Exception ex = null;
   private AsyncTaskCallback onFinish;
 
@@ -21,7 +21,8 @@ public class AsyncGitTask extends AsyncTask<String, Integer, Integer> {
     }
     return 0;
   }
-  public void safelyDoInBackground() throws Exception {}
+
+  public abstract void safelyDoInBackground() throws Exception;
 
   @Override
   protected void onPostExecute(Integer integer) {
@@ -32,7 +33,7 @@ public class AsyncGitTask extends AsyncTask<String, Integer, Integer> {
     return ex;
   }
 
-  public class AsyncTaskCallback {
-    public void onFinish(AsyncGitTask completedTask) {}
+  public abstract class AsyncTaskCallback {
+    public abstract void onFinish(AsyncGitTask completedTask);
   }
 }
