@@ -5,6 +5,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
@@ -25,6 +26,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import slak.gitforandroid.AsyncGitTask;
 import slak.gitforandroid.R;
 import slak.gitforandroid.Repository;
 
@@ -110,7 +112,7 @@ public class MainActivity extends AppCompatActivity {
           @Override
           public void onClick(View view) {
             EditText repoNameEditText = (EditText) dialogView.findViewById(R.id.repo_add_dialog_name);
-            String newRepoName = repoNameEditText.getText().toString();
+            final String newRepoName = repoNameEditText.getText().toString();
             if (newRepoName.isEmpty()) {
               repoNameEditText.setError("This field cannot be empty");
               return;
@@ -126,25 +128,33 @@ public class MainActivity extends AppCompatActivity {
                 return;
               }
               cloneURLEditText.setError(null);
-              try {
-                // TODO: progress bar or something
-                newRepo.gitClone(cloneURL);
-              } catch (GitAPIException | RuntimeException ex) {
-                SomethingTerribleActivity
-                    .runATerribleActivity(MainActivity.this, ex.toString(), "Error");
-                return;
-              }
+              // TODO: progress bar or something
+              newRepo.gitClone(cloneURL, new AsyncGitTask.AsyncTaskCallback() {
+                @Override
+                public void onFinish(AsyncGitTask completedTask) {
+                  if (completedTask.getException() != null) {
+                    SomethingTerribleActivity.runATerribleActivity(
+                        MainActivity.this, completedTask.getException().toString(), "Error");
+                    return;
+                  }
+                  addRepo(newRepoName);
+                  Snackbar.make(dialogView, "Cloned repository", Snackbar.LENGTH_LONG).show();
+                }
+              });
             } else {
-              try {
-                newRepo.gitInit();
-              } catch (GitAPIException | IOException ex) {
-                SomethingTerribleActivity
-                    .runATerribleActivity(MainActivity.this, ex.toString(), "Error");
-                return;
-              }
+              newRepo.gitInit(new AsyncGitTask.AsyncTaskCallback() {
+                @Override
+                public void onFinish(AsyncGitTask completedTask) {
+                  if (completedTask.getException() != null) {
+                    SomethingTerribleActivity.runATerribleActivity(
+                        MainActivity.this, completedTask.getException().toString(), "Error");
+                    return;
+                  }
+                  addRepo(newRepoName);
+                  Snackbar.make(dialogView, "Initialized repository", Snackbar.LENGTH_LONG).show();
+                }
+              });
             }
-            repoNames.add(newRepoName);
-            listElements.notifyDataSetChanged();
             dialog.dismiss();
           }
         };
@@ -153,6 +163,11 @@ public class MainActivity extends AppCompatActivity {
         dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(positive);
       }
     });
+  }
+
+  private void addRepo(String newRepoName) {
+    repoNames.add(newRepoName);
+    listElements.notifyDataSetChanged();
   }
 
   @Override
