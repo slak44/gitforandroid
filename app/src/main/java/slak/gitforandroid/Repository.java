@@ -56,10 +56,16 @@ public class Repository {
     }
   }
 
-  public void gitInit() throws GitAPIException, IOException {
-    if (alreadyExists)
-      throw new WrongRepositoryStateException("Failed to init: Repository " + name + " already exists");
-    git.getRepository().create();
+  public void gitInit(AsyncGitTask.AsyncTaskCallback callback) {
+    AsyncGitTask init = new AsyncGitTask(callback) {
+      @Override
+      public void safelyDoInBackground() throws Exception {
+        if (alreadyExists)
+          throw new WrongRepositoryStateException("Failed to init: Repository " + name + " already exists");
+        git.getRepository().create();
+      }
+    };
+    init.execute();
     alreadyExists = true;
   }
 
