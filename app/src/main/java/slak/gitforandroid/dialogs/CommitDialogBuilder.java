@@ -13,6 +13,7 @@ import android.widget.EditText;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.PersonIdent;
 
+import slak.gitforandroid.AsyncGitTask;
 import slak.gitforandroid.R;
 import slak.gitforandroid.Repository;
 import slak.gitforandroid.activities.SomethingTerribleActivity;
@@ -54,24 +55,29 @@ public class CommitDialogBuilder extends AlertDialog.Builder {
       @Override
       public void onClick(View view) {
         // TODO: add input validation
-        EditText message = (EditText) dialogView.findViewById(R.id.dialog_commit_message);
+        final EditText message = (EditText) dialogView.findViewById(R.id.dialog_commit_message);
         EditText name = (EditText) dialogView.findViewById(R.id.dialog_commit_name);
         EditText email = (EditText) dialogView.findViewById(R.id.dialog_commit_email);
-        try {
-          String nameString = null;
-          String emailString = null;
-          if (!name.getText().toString().isEmpty()) nameString = name.getText().toString();
-          if (!email.getText().toString().isEmpty()) emailString = email.getText().toString();
-          target.gitCommit(nameString, emailString, message.getText().toString());
-          Snackbar.make(
-              context.findViewById(R.id.fab),
-              "Created commit " + message.getText().toString(),
-              Snackbar.LENGTH_LONG)
-              .setAction("Revert", null).show(); // TODO: implement revert commit
-        } catch (RuntimeException ex) {
-          SomethingTerribleActivity.runATerribleActivity(context, ex.toString(), "Error");
-          return;
-        }
+        String nameString = null;
+        String emailString = null;
+        if (!name.getText().toString().isEmpty()) nameString = name.getText().toString();
+        if (!email.getText().toString().isEmpty()) emailString = email.getText().toString();
+        target.gitCommit(nameString, emailString, message.getText().toString(),
+            new AsyncGitTask.AsyncTaskCallback() {
+          @Override
+          public void onFinish(AsyncGitTask completedTask) {
+            if (completedTask.getException() != null) {
+              SomethingTerribleActivity.runATerribleActivity(
+                  context, completedTask.getException().toString(), "Error");
+              return;
+            }
+            Snackbar.make(
+                context.findViewById(R.id.fab),
+                "Created commit " + message.getText().toString(),
+                Snackbar.LENGTH_LONG)
+                .setAction("Revert", null).show(); // TODO: implement revert commit
+          }
+        });
         dialog.dismiss();
       }
     });

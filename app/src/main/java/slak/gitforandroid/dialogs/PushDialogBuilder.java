@@ -13,6 +13,7 @@ import android.widget.EditText;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.PersonIdent;
 
+import slak.gitforandroid.AsyncGitTask;
 import slak.gitforandroid.R;
 import slak.gitforandroid.Repository;
 import slak.gitforandroid.activities.SomethingTerribleActivity;
@@ -68,14 +69,18 @@ public class PushDialogBuilder extends AlertDialog.Builder {
         PasswordDialogBuilder pass = new PasswordDialogBuilder(context) {
           @Override
           public void getPassword(String password) {
-            try {
-              target.gitPush(remote, password);
-            } catch (RuntimeException ex) {
-              SomethingTerribleActivity.runATerribleActivity(context, ex.toString(), "Error");
-              return;
-            }
-            Snackbar.make(
-                context.findViewById(R.id.fab), "Pushed repository", Snackbar.LENGTH_LONG).show();
+            target.gitPush(remote, password, new AsyncGitTask.AsyncTaskCallback() {
+              @Override
+              public void onFinish(AsyncGitTask completedTask) {
+                if (completedTask.getException() != null) {
+                  SomethingTerribleActivity.runATerribleActivity(
+                      context, completedTask.getException().toString(), "Error");
+                  return;
+                }
+                Snackbar.make(
+                    context.findViewById(R.id.fab), "Pushed repository", Snackbar.LENGTH_LONG).show();
+              }
+            });
             dialog.dismiss();
           }
         };
