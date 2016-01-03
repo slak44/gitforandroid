@@ -8,16 +8,8 @@
         android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingBottom="8dp">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:text="@string/push_dialog_remote"
-            android:paddingStart="16dp"
-            android:paddingTop="16dp"
-            android:paddingEnd="16dp"/>
+        android:paddingBottom="8dp"
+        >
 
         <Switch
             android:layout_width="match_parent"
@@ -25,15 +17,34 @@
             android:text="@string/push_dialog_switch_existing_remote"
             android:id="@+id/push_dialog_switch_remote"
             android:gravity="end"
-            android:paddingTop="8dp"/>
+            android:elegantTextHeight="false"
+            android:singleLine="false"
+            android:layout_gravity="center"/>
 
     </LinearLayout>
 
-    <Spinner
+    <LinearLayout
+        android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/push_dialog_dropdown"
-        android:drawableEnd="@drawable/black_ic_arrow_drop_down_24dp"/>
+        android:id="@+id/push_dialog_spinner_layout">
+
+        <Spinner
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/push_dialog_dropdown"
+            android:drawableEnd="@drawable/black_ic_arrow_drop_down_24dp"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="@string/push_dialog_remote_list_empty"
+            android:visibility="gone"
+            android:id="@+id/push_dialog_dropdown_empty"
+            android:textStyle="italic"
+            android:gravity="center"/>
+    </LinearLayout>
 
     <EditText
         android:layout_width="match_parent"

@@ -30,7 +30,7 @@
     <string name="push_dialog_title">Push</string>
     <string name="push_dialog_cancel">Cancel</string>
     <string name="push_dialog_confirm">Push</string>
-    <string name="push_dialog_remote">Pick remote</string>
+    <string name="push_dialog_remote_list_empty">No existing remotes</string>
     <string name="push_dialog_switch_existing_remote">Manual remote</string>
     <string name="push_dialog_manual_remote_hint">Remote URL</string>
 
