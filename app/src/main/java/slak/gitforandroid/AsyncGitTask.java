@@ -33,7 +33,7 @@ public abstract class AsyncGitTask extends AsyncTask<String, Integer, Integer> {
     return ex;
   }
 
-  public abstract class AsyncTaskCallback {
+  public static abstract class AsyncTaskCallback {
     public abstract void onFinish(AsyncGitTask completedTask);
   }
 }
