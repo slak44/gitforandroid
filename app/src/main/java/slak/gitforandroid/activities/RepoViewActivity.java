@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Stack;
 
+import slak.gitforandroid.AsyncGitTask;
 import slak.gitforandroid.R;
 import slak.gitforandroid.Repository;
 import slak.gitforandroid.SelectableAdapterModel;
@@ -184,12 +185,17 @@ public class RepoViewActivity extends AppCompatActivity {
       ArrayList<String> paths = new ArrayList<>();
       for (Integer index : SelectableAdapterModel.getSelectedModels(nodes))
         paths.add(nodes.get(index).getThing().getPath());
-      try {
-        repo.gitAdd(paths);
-        Snackbar.make(findViewById(R.id.action_stage), "Staged items", Snackbar.LENGTH_LONG).show();
-      } catch (GitAPIException | IOException ex) {
-        SomethingTerribleActivity.runATerribleActivity(this, ex.toString(), "Error");
-      }
+      repo.gitAdd(paths, new AsyncGitTask.AsyncTaskCallback() {
+        @Override
+        public void onFinish(AsyncGitTask completedTask) {
+          if (completedTask.getException() != null) {
+            SomethingTerribleActivity.runATerribleActivity(
+                RepoViewActivity.this, completedTask.getException().toString(), "Error");
+            return;
+          }
+          Snackbar.make(findViewById(R.id.action_stage), "Staged items", Snackbar.LENGTH_LONG).show();
+        }
+      });
       return true;
     } else if (item.getItemId() == R.id.action_unstage) {
       // TODO: unstage
