@@ -62,9 +62,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     ListView repoList = (ListView) findViewById(R.id.repoList);
-    repoNames = new ArrayList<String>();
+    repoNames = new ArrayList<>();
     repoNames.addAll(Arrays.asList(Repository.getRepoDirectory(this).list()));
-    listElements = new ArrayAdapter<String>(this, R.layout.list_element_main, repoNames);
+    listElements = new ArrayAdapter<>(this, R.layout.list_element_main, repoNames);
     repoList.setAdapter(listElements);
     repoList.setOnItemClickListener(new ListView.OnItemClickListener() {
       @Override
