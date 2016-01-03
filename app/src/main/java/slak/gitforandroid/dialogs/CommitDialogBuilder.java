@@ -54,8 +54,12 @@ public class CommitDialogBuilder extends AlertDialog.Builder {
     dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View view) {
-        // TODO: add input validation
         final EditText message = (EditText) dialogView.findViewById(R.id.dialog_commit_message);
+        if (message.getText().toString().isEmpty()) {
+          message.setError("Can't be empty");
+          return;
+        }
+        message.setError(null);
         EditText name = (EditText) dialogView.findViewById(R.id.dialog_commit_name);
         EditText email = (EditText) dialogView.findViewById(R.id.dialog_commit_email);
         String nameString = null;

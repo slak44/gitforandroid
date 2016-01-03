@@ -114,7 +114,7 @@ public class MainActivity extends AppCompatActivity {
             EditText repoNameEditText = (EditText) dialogView.findViewById(R.id.repo_add_dialog_name);
             final String newRepoName = repoNameEditText.getText().toString();
             if (newRepoName.isEmpty()) {
-              repoNameEditText.setError("This field cannot be empty");
+              repoNameEditText.setError("Can't be empty");
               return;
             }
             repoNameEditText.setError(null);
@@ -124,7 +124,7 @@ public class MainActivity extends AppCompatActivity {
               EditText cloneURLEditText = (EditText) dialogView.findViewById(R.id.repo_add_dialog_cloneURL);
               String cloneURL = cloneURLEditText.getText().toString();
               if (cloneURL.isEmpty()) {
-                cloneURLEditText.setError("A clone URI is required for cloning");
+                cloneURLEditText.setError("Clone URI required for cloning");
                 return;
               }
               cloneURLEditText.setError(null);
