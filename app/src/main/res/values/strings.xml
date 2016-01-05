@@ -34,6 +34,13 @@
     <string name="push_dialog_switch_existing_remote">Manual remote</string>
     <string name="push_dialog_manual_remote_hint">Remote URL</string>
 
+    <string name="pull_dialog_title">Pull</string>
+    <string name="pull_dialog_cancel">Cancel</string>
+    <string name="pull_dialog_confirm">Pull</string>
+    <string name="pull_dialog_remote_list_empty">No existing remotes</string>
+    <string name="pull_dialog_switch_existing_remote">Manual remote</string>
+    <string name="pull_dialog_manual_remote_hint">Remote URL</string>
+
     <string name="pass_dialog_title">Password</string>
     <string name="pass_dialog_data_hint">Password</string>
     <string name="pass_dialog_cancel">Cancel</string>

@@ -158,6 +158,19 @@ public class Repository {
     push.execute();
   }
 
+  public void gitPull(
+      final String remote,
+      AsyncGitTask.AsyncTaskCallback callback
+  ) {
+    AsyncGitTask pull = new AsyncGitTask(callback) {
+      @Override
+      public void safelyDoInBackground() throws Exception {
+        git.pull().setRemote(remote).call();
+      }
+    };
+    pull.execute();
+  }
+
   public File getRepoFolder() {
     return thisRepo;
   }

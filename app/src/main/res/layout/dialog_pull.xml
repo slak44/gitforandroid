@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent">
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingBottom="8dp"
+        >
+
+        <Switch
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="@string/pull_dialog_switch_existing_remote"
+            android:id="@+id/pull_dialog_switch_remote"
+            android:gravity="end"
+            android:elegantTextHeight="false"
+            android:singleLine="false"
+            android:layout_gravity="center"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/pull_dialog_spinner_layout">
+
+        <Spinner
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/pull_dialog_dropdown"
+            android:drawableEnd="@drawable/black_ic_arrow_drop_down_24dp"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="@string/pull_dialog_remote_list_empty"
+            android:visibility="gone"
+            android:id="@+id/pull_dialog_dropdown_empty"
+            android:textStyle="italic"
+            android:gravity="center"/>
+    </LinearLayout>
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/pull_dialog_manual_remote"
+        android:layout_gravity="center_horizontal"
+        android:inputType="textUri"
+        android:hint="@string/pull_dialog_manual_remote_hint"
+        android:visibility="gone"/>
+</LinearLayout>
