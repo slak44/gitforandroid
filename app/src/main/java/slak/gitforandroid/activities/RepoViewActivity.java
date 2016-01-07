@@ -186,8 +186,10 @@ public class RepoViewActivity extends AppCompatActivity {
       pullDialog.showDialog(repo);
     } else if (item.getItemId() == R.id.action_stage) {
       ArrayList<String> paths = new ArrayList<>();
-      for (Integer index : SelectableAdapterModel.getSelectedModels(nodes))
-        paths.add(nodes.get(index).getThing().getPath());
+      for (Integer index : SelectableAdapterModel.getSelectedModels(nodes)) {
+        paths.add(nodes.get(index).getThing().getPath()
+            .replace(repo.getRepoFolder().getPath() + "/", ""));
+      }
       repo.gitAdd(paths, new AsyncGitTask.AsyncTaskCallback() {
         @Override
         public void onFinish(AsyncGitTask completedTask) {
