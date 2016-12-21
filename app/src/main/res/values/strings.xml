@@ -42,7 +42,7 @@
     <string name="snack_item_pull_success">Pulled from remote \'%s\'</string>
 
     <!-- Push/Pull dialog-->
-    <string name="dialog_push_pull_switch_existing_remote">Pick remote</string>
+    <string name="dialog_push_pull_switch_existing_remote">Manual Remote</string>
     <string name="dialog_push_pull_remote_list_empty">No remotes available</string>
     <string name="dialog_push_pull_manual_remote_hint">Remote URL</string>
     <string name="dialog_push_pull_title_push">Push</string>
