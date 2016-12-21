@@ -4,17 +4,7 @@
 
     <header
         android:fragment="slak.gitforandroid.activities.SettingsActivity$GeneralPreferenceFragment"
-        android:icon="@drawable/black_ic_info_24dp"
+        android:icon="@drawable/white_ic_info_24dp"
         android:title="@string/pref_header_git"/>
-
-    <header
-        android:fragment="slak.gitforandroid.activities.SettingsActivity$NotificationPreferenceFragment"
-        android:icon="@drawable/black_ic_notifications_24dp"
-        android:title="@string/pref_header_notifications"/>
-
-    <header
-        android:fragment="slak.gitforandroid.activities.SettingsActivity$DataSyncPreferenceFragment"
-        android:icon="@drawable/black_ic_sync_24dp"
-        android:title="@string/pref_header_data_sync"/>
 
 </preference-headers>

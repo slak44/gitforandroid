@@ -2,24 +2,21 @@ package slak.gitforandroid
 
 import android.content.Context
 import android.os.Environment
-import android.preference.PreferenceManager
 import android.support.annotation.StringRes
 import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
 import android.view.View
-
 import org.eclipse.jgit.api.CloneCommand
 import org.eclipse.jgit.api.Git
-import org.eclipse.jgit.api.errors.WrongRepositoryStateException
 import org.eclipse.jgit.lib.PersonIdent
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider
+import slak.gitforandroid.activities.getStringSetting
 import slak.gitforandroid.activities.reportError
 import slak.gitforandroid.activities.rootActivityView
-
 import java.io.File
 import java.io.IOException
-import java.util.ArrayList
+import java.util.*
 
 class Repository(private val context: AppCompatActivity, name: String) {
   companion object {
@@ -127,10 +124,8 @@ class Repository(private val context: AppCompatActivity, name: String) {
       message: String,
       callback: (SafeAsyncTask) -> Unit
   ) {
-    // FIXME: this kind of retarded settings access i want abstracted
-    val prefs = PreferenceManager.getDefaultSharedPreferences(context)
     val stored = PersonIdent(
-        prefs.getString("git_name", "")!!, prefs.getString("git_email", "")!!)
+        getStringSetting(context, "git_name"), getStringSetting(context, "git_email"))
     SafeAsyncTask({
       git!!.commit()
           .setAuthor(author ?: stored)
@@ -154,11 +149,9 @@ class Repository(private val context: AppCompatActivity, name: String) {
       message: String,
       callback: (SafeAsyncTask) -> Unit
   ) {
-    val pi: PersonIdent?
-    if (name == null || email == null)
-      pi = null
-    else
-      pi = PersonIdent(name, email)
+    val pi: PersonIdent? =
+        if (name != null && email != null) PersonIdent(name, email)
+        else null
     gitCommit(pi, pi, message, callback)
   }
 
@@ -172,10 +165,10 @@ class Repository(private val context: AppCompatActivity, name: String) {
       callback: (SafeAsyncTask) -> Unit
   ) {
     SafeAsyncTask({
-      val prefs = PreferenceManager.getDefaultSharedPreferences(context)
       val upcp = UsernamePasswordCredentialsProvider(
-          prefs.getString("git_username", ""),
-          password)
+          getStringSetting(context, "git_username"),
+          password
+      )
       git!!.push().setRemote(remote).setCredentialsProvider(upcp).setPushAll().call()
     }, callback).execute()
   }
@@ -186,10 +179,10 @@ class Repository(private val context: AppCompatActivity, name: String) {
       callback: (SafeAsyncTask) -> Unit
   ) {
     SafeAsyncTask({
-      val prefs = PreferenceManager.getDefaultSharedPreferences(context)
       val upcp = UsernamePasswordCredentialsProvider(
-          prefs.getString("git_username", ""),
-          password)
+          getStringSetting(context, "git_username"),
+          password
+      )
       git!!.pull().setRemote(remote).setCredentialsProvider(upcp).call()
     }, callback).execute()
   }

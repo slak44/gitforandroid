@@ -1,8 +1,10 @@
 package slak.gitforandroid.activities
 
 import android.app.AlertDialog
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.preference.PreferenceManager
 import android.support.annotation.StringRes
 import android.support.design.widget.FloatingActionButton
 import android.support.design.widget.Snackbar
@@ -32,6 +34,10 @@ fun reportError(activity: AppCompatActivity, @StringRes strRes: Int, e: Exceptio
 
 fun rootActivityView(activity: AppCompatActivity): View {
   return activity.window.decorView.rootView
+}
+
+fun getStringSetting(context: Context, key: String): String {
+  return PreferenceManager.getDefaultSharedPreferences(context).getString(key, "")
 }
 
 class MainActivity : AppCompatActivity() {
