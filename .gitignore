@@ -2,9 +2,11 @@
 build/
 local.properties
 captures/
+app/libs/
+projectFilesBackup/
 *.iml
 .idea/workspace.xml
 .idea/gradle.xml
 .idea/libraries
-app/libs/
-projectFilesBackup/
+.idea/markdown-navigator.xml
+.idea/markdown-navigator/
