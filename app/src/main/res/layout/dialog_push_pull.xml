@@ -7,18 +7,15 @@
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingBottom="8dp"
-        >
+        android:layout_height="wrap_content">
 
         <Switch
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:text="@string/push_dialog_switch_existing_remote"
-            android:id="@+id/push_dialog_switch_remote"
+            android:text="@string/dialog_push_pull_switch_existing_remote"
+            android:id="@+id/dialog_push_pull_switch_remote"
             android:gravity="end"
             android:elegantTextHeight="false"
-            android:singleLine="false"
             android:layout_gravity="center"/>
 
     </LinearLayout>
@@ -27,21 +24,21 @@
         android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/push_dialog_spinner_layout">
+        android:id="@+id/dialog_push_pull_spinner_layout">
 
         <Spinner
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/push_dialog_dropdown"
+            android:id="@+id/dialog_push_pull_dropdown"
             android:drawableEnd="@drawable/black_ic_arrow_drop_down_24dp"/>
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceMedium"
-            android:text="@string/push_dialog_remote_list_empty"
+            android:text="@string/dialog_push_pull_remote_list_empty"
             android:visibility="gone"
-            android:id="@+id/push_dialog_dropdown_empty"
+            android:id="@+id/dialog_push_pull_dropdown_empty"
             android:textStyle="italic"
             android:gravity="center"/>
     </LinearLayout>
@@ -49,9 +46,9 @@
     <EditText
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/push_dialog_manual_remote"
+        android:id="@+id/dialog_push_pull_manual_remote"
         android:layout_gravity="center_horizontal"
         android:inputType="textUri"
-        android:hint="@string/push_dialog_manual_remote_hint"
+        android:hint="@string/dialog_push_pull_manual_remote_hint"
         android:visibility="gone"/>
 </LinearLayout>

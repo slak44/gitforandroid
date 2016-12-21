@@ -3,19 +3,19 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context=".activities.RepoViewActivity">
 
-    <item android:id="@+id/action_stage"
-        android:title="@string/menu_action_stage"
+    <item android:id="@+id/menu_repo_view_action_stage"
+        android:title="@string/menu_repo_view_stage"
         android:icon="@drawable/white_ic_add_24dp"
         android:orderInCategory="100"
         app:showAsAction="ifRoom" />
-    <item android:id="@+id/action_unstage"
-        android:title="@string/menu_action_unstage"
+    <item android:id="@+id/menu_repo_view_action_unstage"
+        android:title="@string/menu_repo_view_unstage"
         android:icon="@drawable/white_ic_remove_24dp"
         android:orderInCategory="101"
         app:showAsAction="ifRoom" />
-    <item android:id="@+id/action_delete"
-        android:title="@string/menu_action_delete"
+    <item android:id="@+id/menu_repo_view_action_delete"
+        android:title="@string/menu_repo_view_delete"
         android:icon="@drawable/white_ic_delete_24dp"
-        android:orderInCategory="102"
+        android:orderInCategory="105"
         app:showAsAction="ifRoom" />
 </menu>

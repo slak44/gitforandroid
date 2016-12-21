@@ -1,58 +1,83 @@
 <resources>
     <string name="app_name">GitForAndroid</string>
-    <string name="app_no_storage">Cannot find storage</string>
     <string name="app_quit">Quit</string>
-    <string name="action_settings">Settings</string>
 
-    <string name="menu_action_stage">Add To Staging</string>
-    <string name="menu_action_unstage">Remove From Staging</string>
-    <string name="menu_action_delete">Delete</string>
-    <string name="menu_action_push">Push</string>
-    <string name="menu_action_pull">Pull</string>
-
-    <string name="add_repo_dialog_name_hint">Repository Name</string>
-    <string name="add_repo_dialog_clone_switch">Clone</string>
-    <string name="add_repo_dialog_cloneURL_hint">URL</string>
-    <string name="add_repo_dialog_confirm">Create</string>
-    <string name="add_repo_dialog_cancel">Cancel</string>
-    <string name="add_repo_dialog_title">New Repository</string>
-
-    <string name="folder_empty_repo_view">There is nothing here</string>
-
-    <string name="commit_dialog_title">Commit</string>
-    <string name="commit_dialog_message_hint">Commit message</string>
-    <string name="commit_dialog_substitute_switch">Set committer data</string>
-    <string name="commit_dialog_su_name_hint">Name</string>
-    <string name="commit_dialog_su_email_hint">Email</string>
-    <string name="commit_dialog_confirm">Commit</string>
-    <string name="commit_dialog_cancel">Cancel</string>
-
-    <string name="push_dialog_title">Push</string>
-    <string name="push_dialog_cancel">Cancel</string>
-    <string name="push_dialog_confirm">Push</string>
-    <string name="push_dialog_remote_list_empty">No existing remotes</string>
-    <string name="push_dialog_switch_existing_remote">Manual remote</string>
-    <string name="push_dialog_manual_remote_hint">Remote URL</string>
-
-    <string name="pull_dialog_title">Pull</string>
-    <string name="pull_dialog_cancel">Cancel</string>
-    <string name="pull_dialog_confirm">Pull</string>
-    <string name="pull_dialog_remote_list_empty">No existing remotes</string>
-    <string name="pull_dialog_switch_existing_remote">Manual remote</string>
-    <string name="pull_dialog_manual_remote_hint">Remote URL</string>
-
-    <string name="pass_dialog_title">Password</string>
-    <string name="pass_dialog_data_hint">Password</string>
-    <string name="pass_dialog_cancel">Cancel</string>
-    <string name="pass_dialog_confirm">Send</string>
-
-    <string name="error_title">Something bad happened</string>
-    <string name="error_return">Go back</string>
-
+    <!-- Activity titles -->
     <string name="title_activity_repo_view">Repository</string>
     <string name="title_activity_settings">Settings</string>
-    <!-- Strings related to Settings -->
 
+    <!-- Errors -->
+    <string name="error_init_failed">Failed to initialize repository</string>
+    <string name="error_clone_failed">Failed to clone repository</string>
+    <string name="error_add_failed">Failed to stage items</string>
+    <string name="error_commit_failed">Failed to commit</string>
+    <string name="error_push_failed">Failed to push branch</string>
+    <string name="error_pull_failed">Failed to pull branch</string>
+    <string name="error_io_failed">Filesystem error</string>
+    <string name="error_repo_name_conflict">A repository with this name already exists</string>
+    <string name="error_need_clone_URI">Target URI required for cloning</string>
+    <string name="error_storage_unavailable">Filesystem unavailable</string>
+
+    <!-- Main activity menu -->
+    <string name="menu_main_settings">Settings</string>
+
+    <!-- Repo view activity menu -->
+    <string name="menu_repo_view_stage">Add To Staging</string>
+    <string name="menu_repo_view_unstage">Remove From Staging</string>
+    <string name="menu_repo_view_delete">Delete</string>
+    <string name="menu_repo_view_push">Push</string>
+    <string name="menu_repo_view_pull">Pull</string>
+    <string name="menu_repo_view_quick_commit">Quick commit</string>
+
+    <!-- Snack action text -->
+    <string name="snack_action_revert_commit">Revert</string>
+
+    <!-- Snack text -->
+    <string name="snack_clone_success">Cloned repository</string>
+    <string name="snack_init_success">Initialized repository</string>
+    <string name="snack_item_stage_success">Items staged</string>
+    <string name="snack_item_stage_all_success">All repository items staged</string>
+    <string name="snack_item_commit_success">Created commit \'%s\'</string>
+    <string name="snack_item_push_success">Pushed to remote \'%s\'</string>
+    <string name="snack_item_pull_success">Pulled from remote \'%s\'</string>
+
+    <!-- Push/Pull dialog-->
+    <string name="dialog_push_pull_switch_existing_remote">Pick remote</string>
+    <string name="dialog_push_pull_remote_list_empty">No remotes available</string>
+    <string name="dialog_push_pull_manual_remote_hint">Remote URL</string>
+    <string name="dialog_push_pull_title_push">Push</string>
+    <string name="dialog_push_pull_title_pull">Pull</string>
+    <string name="dialog_push_pull_confirm_push">Push</string>
+    <string name="dialog_push_pull_confirm_pull">Pull</string>
+    <string name="dialog_push_pull_cancel">Cancel</string>
+
+    <!-- Commit dialog -->
+    <string name="dialog_commit_title">Commit</string>
+    <string name="dialog_commit_message_hint">Commit message</string>
+    <string name="dialog_commit_substitute_switch">Set committer data</string>
+    <string name="dialog_commit_su_name_hint">Name</string>
+    <string name="dialog_commit_su_email_hint">Email</string>
+    <string name="dialog_commit_confirm">Commit</string>
+    <string name="dialog_commit_cancel">Cancel</string>
+
+    <!-- New repo dialog -->
+    <string name="dialog_add_repo_name_hint">Repository Name</string>
+    <string name="dialog_add_repo_clone_switch">Clone</string>
+    <string name="dialog_add_repo_cloneURL_hint">URL</string>
+    <string name="dialog_add_repo_confirm">Create</string>
+    <string name="dialog_add_repo_cancel">Cancel</string>
+    <string name="dialog_add_repo_title">New Repository</string>
+
+    <!-- Password dialog -->
+    <string name="dialog_pass_title">Password</string>
+    <string name="dialog_pass_data_hint">Password</string>
+    <string name="dialog_pass_cancel">Cancel</string>
+    <string name="dialog_pass_confirm">Send</string>
+
+    <!-- Empty folder text -->
+    <string name="folder_empty_repo_view">There is nothing here</string>
+
+    <!-- Strings related to Settings -->
     <string name="pref_header_git">Git Config</string>
 
     <string name="pref_git_full_name">Full Name</string>
