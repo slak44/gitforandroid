@@ -15,9 +15,12 @@ import slak.gitforandroid.activities.getStringSetting
 import slak.gitforandroid.activities.reportError
 import slak.gitforandroid.activities.rootActivityView
 import java.io.File
-import java.io.IOException
 import java.util.*
 
+/**
+ * Representation of a repository that provides a wrapper over JGit's `Git` and `Repository` classes
+ * @param name repository name in storage
+ */
 class Repository(private val context: AppCompatActivity, name: String) {
   companion object {
     fun getRepoDirectory(currentActivity: Context): File {
@@ -26,6 +29,13 @@ class Repository(private val context: AppCompatActivity, name: String) {
       return f
     }
 
+    /**
+     * Returns a callback that alerts the user of the task result.
+     * @param view to attach snackbar to
+     * @param fail snackbar text for error
+     * @param success snackbar text for success
+     * @param next optional function to run only after success
+     */
     fun callbackFactory(
         view: View,
         @StringRes fail: Int,
@@ -48,7 +58,7 @@ class Repository(private val context: AppCompatActivity, name: String) {
 
   private var alreadyExists: Boolean = false
   val repoFolder: File
-  private var git: Git? = null
+  private var git: Git
 
   init {
     // The storage dir is a folder called repositories in the private external storage
@@ -56,16 +66,12 @@ class Repository(private val context: AppCompatActivity, name: String) {
     repoFolder = File(storageDir, name)
     alreadyExists = repoFolder.exists()
     val builder = FileRepositoryBuilder()
-    try {
-      builder.gitDir = File(repoFolder, ".git")
-      val internalRepo = builder
-          .readEnvironment()
-          .findGitDir()
-          .build()
-      git = Git(internalRepo)
-    } catch (ioEx: IOException) {
-      reportError(context, R.string.error_io_failed, ioEx, "WTF")
-    }
+    builder.gitDir = File(repoFolder, ".git")
+    val internalRepo: org.eclipse.jgit.lib.Repository = builder
+        .readEnvironment()
+        .findGitDir()
+        .build()
+    git = Git(internalRepo)
   }
 
   fun gitInit(callback: (SafeAsyncTask) -> Unit) {
@@ -78,7 +84,7 @@ class Repository(private val context: AppCompatActivity, name: String) {
         ).show()
         return@SafeAsyncTask
       }
-      git!!.repository.create()
+      git.repository.create()
       alreadyExists = true
     }, callback).execute()
   }
@@ -104,7 +110,7 @@ class Repository(private val context: AppCompatActivity, name: String) {
 
   fun gitAdd(filePatterns: ArrayList<String>, callback: (SafeAsyncTask) -> Unit) {
     SafeAsyncTask({
-      val aCom = git!!.add()
+      val aCom = git.add()
       for (pattern in filePatterns) aCom.addFilepattern(pattern)
       aCom.call()
     }, callback).execute()
@@ -112,7 +118,7 @@ class Repository(private val context: AppCompatActivity, name: String) {
 
   fun gitAddAll(callback: (SafeAsyncTask) -> Unit) {
     SafeAsyncTask({
-      val aCom = git!!.add()
+      val aCom = git.add()
       aCom.addFilepattern(".")
       aCom.call()
     }, callback).execute()
@@ -127,7 +133,7 @@ class Repository(private val context: AppCompatActivity, name: String) {
     val stored = PersonIdent(
         getStringSetting(context, "git_name"), getStringSetting(context, "git_email"))
     SafeAsyncTask({
-      git!!.commit()
+      git.commit()
           .setAuthor(author ?: stored)
           .setCommitter(committer ?: stored)
           .setMessage(message)
@@ -169,7 +175,7 @@ class Repository(private val context: AppCompatActivity, name: String) {
           getStringSetting(context, "git_username"),
           password
       )
-      git!!.push().setRemote(remote).setCredentialsProvider(upcp).setPushAll().call()
+      git.push().setRemote(remote).setCredentialsProvider(upcp).setPushAll().call()
     }, callback).execute()
   }
 
@@ -183,7 +189,7 @@ class Repository(private val context: AppCompatActivity, name: String) {
           getStringSetting(context, "git_username"),
           password
       )
-      git!!.pull().setRemote(remote).setCredentialsProvider(upcp).call()
+      git.pull().setRemote(remote).setCredentialsProvider(upcp).call()
     }, callback).execute()
   }
 
