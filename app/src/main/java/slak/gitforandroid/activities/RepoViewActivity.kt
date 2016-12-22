@@ -161,49 +161,44 @@ class RepoViewActivity : AppCompatActivity() {
   }
 
   override fun onOptionsItemSelected(item: MenuItem): Boolean {
-    if (item.itemId == android.R.id.home) {
-      // Behave like the hardware back button
-      onBackPressed()
-      return true // Event consumed
-    } else if (item.itemId == R.id.menu_repo_view_action_push) {
-      pushPullDialog(this, repo!!, RemoteOp.PUSH)
-    } else if (item.itemId == R.id.menu_repo_view_action_pull) {
-      pushPullDialog(this, repo!!, RemoteOp.PULL)
-    } else if (item.itemId == R.id.menu_repo_view_action_quick_commit) {
-      // 1. Ask for password
-      // 2. Stage everything
-      // 3. Commit
-      // 4. Push to origin
-      passwordDialog(this, { pass: String ->
-        val gitPushCb = Repository.callbackFactory(
-            fab!!,
-            R.string.error_push_failed,
-            R.string.snack_item_push_success
-        )
-        val gitQCommitCb = Repository.callbackFactory(
-            fab!!,
-            R.string.error_commit_failed,
-            R.string.snack_item_commit_success,
-            { repo!!.gitPush("origin", pass, gitPushCb) }
-        )
-        val gitAddCb = Repository.callbackFactory(
-            fab!!,
-            R.string.error_add_failed,
-            R.string.snack_item_stage_all_success,
-            { repo!!.gitQuickCommit(gitQCommitCb) }
-        )
-        repo!!.gitAddAll(gitAddCb)
-      })
-      return true
-    } else if (item.itemId == R.id.menu_repo_view_action_stage) {
-      stageSelected()
-      return true
-    } else if (item.itemId == R.id.menu_repo_view_action_unstage) {
-      // TODO: unstage
-    } else if (item.itemId == R.id.menu_repo_view_action_delete) {
-      // TODO: delete
+    when (item.itemId) {
+      android.R.id.home -> onBackPressed() // Behave like the hardware back button
+      R.id.menu_repo_view_action_push -> pushPullDialog(this, repo!!, RemoteOp.PUSH)
+      R.id.menu_repo_view_action_pull -> pushPullDialog(this, repo!!, RemoteOp.PULL)
+      R.id.menu_repo_view_action_stage -> stageSelected()
+      R.id.menu_repo_view_action_unstage -> Unit // TODO
+      R.id.menu_repo_view_action_delete -> Unit // TODO
+      R.id.menu_repo_view_action_add_all -> repo!!.gitAddAll(Repository.callbackFactory(
+          fab!!, R.string.error_add_failed, R.string.snack_item_stage_all_success))
+      R.id.menu_repo_view_action_quick_commit -> {
+        // 1. Ask for password
+        // 2. Stage everything
+        // 3. Commit
+        // 4. Push to origin
+        passwordDialog(this, { pass: String ->
+          val gitPushCb = Repository.callbackFactory(
+              fab!!,
+              R.string.error_push_failed,
+              R.string.snack_item_push_success
+          )
+          val gitQCommitCb = Repository.callbackFactory(
+              fab!!,
+              R.string.error_commit_failed,
+              R.string.snack_item_commit_success,
+              { repo!!.gitPush("origin", pass, gitPushCb) }
+          )
+          val gitAddCb = Repository.callbackFactory(
+              fab!!,
+              R.string.error_add_failed,
+              R.string.snack_item_stage_all_success,
+              { repo!!.gitQuickCommit(gitQCommitCb) }
+          )
+          repo!!.gitAddAll(gitAddCb)
+        })
+      }
+      else -> return super.onOptionsItemSelected(item)
     }
-    return super.onOptionsItemSelected(item)
+    return true
   }
 
   // Override back button so it traverses the folder structure before exiting the activity

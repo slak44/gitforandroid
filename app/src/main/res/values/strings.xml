@@ -21,13 +21,15 @@
     <!-- Main activity menu -->
     <string name="menu_main_settings">Settings</string>
 
-    <!-- Repo view activity menu -->
+    <!-- Repo view long-press menu -->
     <string name="menu_repo_view_stage">Add To Staging</string>
     <string name="menu_repo_view_unstage">Remove From Staging</string>
     <string name="menu_repo_view_delete">Delete</string>
+    <!-- Repo view activity menu -->
     <string name="menu_repo_view_push">Push</string>
     <string name="menu_repo_view_pull">Pull</string>
     <string name="menu_repo_view_quick_commit">Quick commit</string>
+    <string name="menu_repo_view_add_all">Add all files</string>
 
     <!-- Snack action text -->
     <string name="snack_action_revert_commit">Revert</string>
