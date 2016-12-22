@@ -1,5 +1,5 @@
 .gradle/
-gradle/wrapper/
+gradle/
 gradlew
 gradlew.bat
 build/
@@ -13,3 +13,4 @@ projectFilesBackup/
 .idea/libraries
 .idea/markdown-navigator.xml
 .idea/markdown-navigator/
+.idea/dictionaries/

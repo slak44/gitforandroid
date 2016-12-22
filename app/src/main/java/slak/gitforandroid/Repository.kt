@@ -8,6 +8,7 @@ import android.support.v7.app.AppCompatActivity
 import android.view.View
 import org.eclipse.jgit.api.CloneCommand
 import org.eclipse.jgit.api.Git
+import org.eclipse.jgit.diff.DiffEntry
 import org.eclipse.jgit.lib.PersonIdent
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider
@@ -124,6 +125,22 @@ class Repository(private val context: AppCompatActivity, name: String) {
     }, callback).execute()
   }
 
+  fun gitRm(filePatterns: ArrayList<String>, callback: (SafeAsyncTask) -> Unit) {
+    SafeAsyncTask({
+      val rmCom = git.rm().setCached(true)
+      for (pattern in filePatterns) rmCom.addFilepattern(pattern)
+      rmCom.call()
+    }, callback).execute()
+  }
+
+  fun gitDelete(filePatterns: ArrayList<String>, callback: (SafeAsyncTask) -> Unit) {
+    SafeAsyncTask({
+      val rmCom = git.rm()
+      for (pattern in filePatterns) rmCom.addFilepattern(pattern)
+      rmCom.call()
+    }, callback).execute()
+  }
+
   fun gitCommit(
       author: PersonIdent?,
       committer: PersonIdent?,
@@ -191,6 +208,19 @@ class Repository(private val context: AppCompatActivity, name: String) {
       )
       git.pull().setRemote(remote).setCredentialsProvider(upcp).call()
     }, callback).execute()
+  }
+
+  fun gitDiffCached(callback: (List<DiffEntry>) -> Unit) {
+    var diffs: List<DiffEntry>? = null
+    SafeAsyncTask({
+      diffs = git.diff().setCached(true).setShowNameAndStatusOnly(true).call()
+    }, { completedTask: SafeAsyncTask ->
+      if (completedTask.exception != null) {
+        reportError(context, R.string.error_diff_failed, completedTask.exception!!)
+        return@SafeAsyncTask
+      }
+      callback(diffs!!)
+    }).execute()
   }
 
   fun listRemotes(): Array<out String> {

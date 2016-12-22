@@ -2,4 +2,4 @@
 
 Git client for Android.
 
-Compatibility currently limited to API level 23 (Android 6.0 Marshmallow).
+Compatibility limited to API level 24 (Android 7.0 Nougat).
