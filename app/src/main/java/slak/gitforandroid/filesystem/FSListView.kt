@@ -32,9 +32,7 @@ class FSListView : ListView {
   internal var onMultiSelectEnd: () -> Unit = {}
     set
 
-  internal var onEmptyFolderEnter: () -> Unit = {}
-    set
-  internal var onEmptyFolderExit: () -> Unit = {}
+  internal var onFolderChange: (old: File, new: File) -> Unit = { old: File, new: File -> }
     set
 
   init {
@@ -104,8 +102,13 @@ class FSListView : ListView {
   private fun updateNodes() {
     nodes.clear()
     nodes.addAll(SelectableAdapterModel.fromArray(fileStack.peek().thing.listFiles()))
-    if (nodes.isEmpty()) onEmptyFolderEnter()
-    else onEmptyFolderExit()
+
+    // Little hack to get the old directory for the folder change
+    val topOfStack = fileStack.peek()
+    fileStack.pop()
+    onFolderChange(fileStack.peek().thing, topOfStack.thing)
+    fileStack.push(topOfStack)
+
     nodes.sort { lhs, rhs ->
       // Directories before files
       if (lhs.thing.isDirectory xor rhs.thing.isDirectory) {
@@ -125,7 +128,7 @@ class FSListView : ListView {
    */
   fun goUp(): Boolean {
     if (fileStack.size <= 1) {
-      fileStack = Stack<SelectableAdapterModel<File>>() // ??
+      fileStack = Stack<SelectableAdapterModel<File>>()
       return false
     } else {
       fileStack.pop()

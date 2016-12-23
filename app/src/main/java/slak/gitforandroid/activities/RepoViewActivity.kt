@@ -41,8 +41,13 @@ class RepoViewActivity : AppCompatActivity() {
     lv!!.onMultiSelectEnd = { inflateMenu(R.menu.menu_repo_view) }
 
     val emptyFolderText = findViewById(R.id.repo_view_empty_folder)!!
-    lv!!.onEmptyFolderEnter = { emptyFolderText.visibility = View.VISIBLE }
-    lv!!.onEmptyFolderExit = { emptyFolderText.visibility = View.GONE }
+    lv!!.onFolderChange = { old, new ->
+      if (new.list().isEmpty()) {
+        emptyFolderText.visibility = View.VISIBLE
+      } else {
+        emptyFolderText.visibility = View.GONE
+      }
+    }
 
     fab = findViewById(R.id.fab) as FloatingActionButton
     fab!!.setOnClickListener {
