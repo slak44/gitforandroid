@@ -10,6 +10,29 @@
         <item name="windowNoTitle">true</item>
     </style>
 
+    <style name="ApplicationTheme.ListItem">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:minHeight">?android:attr/listPreferredItemHeightSmall</item>
+        <item name="android:paddingEnd">?android:attr/listPreferredItemPaddingEnd</item>
+        <item name="android:paddingStart">?android:attr/listPreferredItemPaddingStart</item>
+        <item name="android:textAppearance">?android:attr/textAppearanceListItemSmall</item>
+    </style>
+
+    <style name="ApplicationTheme.FSListItemView" parent="ApplicationTheme.ListItem">
+        <item name="android:drawablePadding">@dimen/drawable_text_padding</item>
+        <item name="android:drawableTint">@android:color/white</item>
+    </style>
+
+    <style name="ApplicationTheme.FSListViewEmptyFolder">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:gravity">center</item>
+        <item name="android:textAppearance">?android:attr/textAppearanceListItemSmall</item>
+        <item name="android:textStyle">italic</item>
+    </style>
+
     <style name="ApplicationTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar"/>
 
     <style name="ApplicationTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light"/>

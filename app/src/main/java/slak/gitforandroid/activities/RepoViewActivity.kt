@@ -6,6 +6,7 @@ import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import slak.gitforandroid.*
 import slak.gitforandroid.filesystem.FSListView
 
@@ -38,6 +39,10 @@ class RepoViewActivity : AppCompatActivity() {
     lv!!.init(this, repo!!.repoFolder)
     lv!!.onMultiSelectStart = { inflateMenu(R.menu.menu_multi_select) }
     lv!!.onMultiSelectEnd = { inflateMenu(R.menu.menu_repo_view) }
+
+    val emptyFolderText = findViewById(R.id.repo_view_empty_folder)!!
+    lv!!.onEmptyFolderEnter = { emptyFolderText.visibility = View.VISIBLE }
+    lv!!.onEmptyFolderExit = { emptyFolderText.visibility = View.GONE }
 
     fab = findViewById(R.id.fab) as FloatingActionButton
     fab!!.setOnClickListener {

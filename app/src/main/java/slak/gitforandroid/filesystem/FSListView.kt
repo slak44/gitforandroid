@@ -32,14 +32,17 @@ class FSListView : ListView {
   internal var onMultiSelectEnd: () -> Unit = {}
     set
 
+  internal var onEmptyFolderEnter: () -> Unit = {}
+    set
+  internal var onEmptyFolderExit: () -> Unit = {}
+    set
+
   init {
     nodes = ArrayList<SelectableAdapterModel<File>>()
   }
 
-  constructor(context: Context) : super(context) {}
-
-  constructor(context: Context, set: AttributeSet) : super(context, set) {}
-
+  constructor(context: Context) : this(context, null) {}
+  constructor(context: Context, set: AttributeSet?) : super(context, set) {}
   constructor(context: Context, set: AttributeSet, defStyle: Int) : super(context, set, defStyle) {}
 
   fun init(activity: RepoViewActivity, root: File) {
@@ -70,12 +73,12 @@ class FSListView : ListView {
             resources.getColor(R.color.colorSelected, activity.theme))
         return@OnItemClickListener
       }
-      // Entering a new folder
-      if (view.id == R.id.list_element_folder) {
+      if (view !is FSListItemView) return@OnItemClickListener
+      if (view.type == FSItemType.FOLDER) {
         fileStack.push(nodes[position])
         updateNodes()
         listElements!!.notifyDataSetChanged()
-      } else if (view.id == R.id.list_element_file) {
+      } else if (view.type == FSItemType.FILE) {
         val intent = Intent(Intent.ACTION_VIEW)
         val uri = Uri.parse("content://" + nodes[position].thing.absolutePath)
         intent.setDataAndType(uri, "text/plain")
@@ -84,6 +87,7 @@ class FSListView : ListView {
     })
     this.onItemLongClickListener = AdapterView.OnItemLongClickListener {
       parent, view, position, id ->
+      if (view !is FSListItemView) return@OnItemLongClickListener false
       multiSelectState = true
       // No item was checked: style the toolbar for multi-select
       if (SelectableAdapterModel.getSelectedModels(nodes).size == 0) onMultiSelectStart()
@@ -100,6 +104,8 @@ class FSListView : ListView {
   private fun updateNodes() {
     nodes.clear()
     nodes.addAll(SelectableAdapterModel.fromArray(fileStack.peek().thing.listFiles()))
+    if (nodes.isEmpty()) onEmptyFolderEnter()
+    else onEmptyFolderExit()
     nodes.sort { lhs, rhs ->
       // Directories before files
       if (lhs.thing.isDirectory xor rhs.thing.isDirectory) {

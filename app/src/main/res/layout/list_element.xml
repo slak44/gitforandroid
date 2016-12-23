@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<slak.gitforandroid.filesystem.FSListItemView
+    android:id="@+id/list_element"
+    style="@style/ApplicationTheme.FSListItemView"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+</slak.gitforandroid.filesystem.FSListItemView>
