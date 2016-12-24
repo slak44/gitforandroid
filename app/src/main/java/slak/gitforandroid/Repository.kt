@@ -16,6 +16,7 @@ import slak.gitforandroid.activities.getStringSetting
 import slak.gitforandroid.activities.reportError
 import slak.gitforandroid.activities.rootActivityView
 import java.io.File
+import java.net.URI
 import java.util.*
 
 /**
@@ -225,5 +226,9 @@ class Repository(private val context: AppCompatActivity, name: String) {
 
   fun listRemotes(): Array<out String> {
     return File(repoFolder, ".git/refs/remotes").list()
+  }
+
+  fun relativize(path: URI): URI {
+    return repoFolder.toURI().relativize(path)
   }
 }

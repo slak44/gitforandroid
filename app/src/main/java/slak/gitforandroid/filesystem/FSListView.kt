@@ -3,7 +3,11 @@ package slak.gitforandroid.filesystem
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.support.v7.app.AppCompatActivity
 import android.util.AttributeSet
+import android.util.Log
+import android.view.View
+import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ListView
 
@@ -15,6 +19,10 @@ import slak.gitforandroid.R
 import slak.gitforandroid.activities.RepoViewActivity
 
 class FSListView : ListView {
+  companion object {
+    const val TAG = "FSListView"
+  }
+
   private var nodes: ArrayList<SelectableAdapterModel<File>>
   private var listElements: FSArrayAdapter? = null
   private var folderStack = Stack<SelectableAdapterModel<File>>()
@@ -42,6 +50,17 @@ class FSListView : ListView {
    */
   internal var onFolderChange: (old: File, new: File) -> Unit = { old: File, new: File -> }
     set
+  /**
+   * Called by the FSArrayAdapter for each view it needs to prepare. Implementations of this
+   * function should try to recycle the given View? if it is possible, and inflate a new layout only
+   * if necessary.
+   */
+  internal var onChildViewPrepare: (AppCompatActivity, File, View?, ViewGroup) -> FSAbstractListItem
+      = { context: AppCompatActivity, file: File, convertView: View?, parent: ViewGroup ->
+    if (convertView != null && convertView is FSAbstractListItem) convertView
+    else context.layoutInflater.inflate(R.layout.list_element, parent, false) as FSAbstractListItem
+  }
+    set
 
   init {
     nodes = ArrayList<SelectableAdapterModel<File>>()
@@ -55,13 +74,13 @@ class FSListView : ListView {
    * Populate the list with files from the given root.
    * @param root the root of the navigation
    */
-  fun init(activity: RepoViewActivity, root: File) {
+  fun init(activity: AppCompatActivity, root: File) {
     this.root = root
     // Don't bother doing anything in the editor
     if (isInEditMode) return
     folderStack.push(SelectableAdapterModel(root))
     updateNodes()
-    listElements = FSArrayAdapter(activity, R.layout.list_element_main, nodes)
+    listElements = FSArrayAdapter(activity, R.layout.list_element_main, nodes, this)
     super.setAdapter(listElements)
     super.setOnItemClickListener(AdapterView.OnItemClickListener { parent, view, position, id ->
       // Directory empty, nothing to do here
@@ -83,7 +102,7 @@ class FSListView : ListView {
             resources.getColor(R.color.colorSelected, activity.theme))
         return@OnItemClickListener
       }
-      if (view !is FSListItemView) return@OnItemClickListener
+      if (view !is FSAbstractListItem) return@OnItemClickListener
       if (view.type == FSItemType.FOLDER) {
         folderStack.push(nodes[position])
         updateNodes()
@@ -93,11 +112,13 @@ class FSListView : ListView {
         val uri = Uri.parse("content://" + nodes[position].thing.absolutePath)
         intent.setDataAndType(uri, "text/plain")
         activity.startActivity(intent)
+      } else {
+        Log.w(TAG, "Unhandled FSItemType!")
       }
     })
     this.onItemLongClickListener = AdapterView.OnItemLongClickListener {
       parent, view, position, id ->
-      if (view !is FSListItemView) return@OnItemLongClickListener false
+      if (view !is FSAbstractListItem) return@OnItemLongClickListener false
       multiSelectState = true
       // No item was checked: style the toolbar for multi-select
       if (SelectableAdapterModel.getSelectedModels(nodes).size == 0) onMultiSelectStart()

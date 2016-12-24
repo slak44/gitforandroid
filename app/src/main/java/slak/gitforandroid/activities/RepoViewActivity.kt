@@ -8,10 +8,11 @@ import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.view.ViewGroup
 import org.eclipse.jgit.diff.DiffEntry
 import slak.gitforandroid.*
-import slak.gitforandroid.filesystem.FSListItemView
 import slak.gitforandroid.filesystem.FSListView
+import java.io.File
 import java.util.*
 
 class RepoViewActivity : AppCompatActivity() {
@@ -44,20 +45,29 @@ class RepoViewActivity : AppCompatActivity() {
     lv!!.onMultiSelectEnd = { inflateMenu(R.menu.menu_repo_view) }
 
     var fileDiffs: List<DiffEntry> = ArrayList()
+    lv!!.onChildViewPrepare = cb@ {
+      context: AppCompatActivity, file: File, convertView: View?, parent: ViewGroup ->
+      val path = repo!!.relativize(file.toURI()).toString()
+      val newGitStatus: GitStatus = fileDiffs
+          .firstOrNull { it.newPath == path }
+          ?.let { GitStatus.from(it.changeType) }
+          ?: GitStatus.NONE
+      if (convertView != null && convertView is RepoListItemView &&
+          convertView.gitStatus == newGitStatus) {
+        return@cb convertView
+      }
+      val view = context.layoutInflater.inflate(R.layout.list_element, parent, false)
+          as RepoListItemView
+      view.gitStatus = newGitStatus
+      return@cb view
+    }
+
     val emptyFolderText = findViewById(R.id.repo_view_empty_folder)!!
     lv!!.onFolderChange = { old, new ->
       if (new.list().isEmpty()) {
         emptyFolderText.visibility = View.VISIBLE
       } else {
         emptyFolderText.visibility = View.GONE
-      }
-      val paths = new.list()
-      fileDiffs.forEach { diff ->
-        paths.withIndex().forEach { path ->
-          if (path.value == diff.newPath) {
-            // TODO: update the view for this file with the diff here
-          }
-        }
       }
     }
 

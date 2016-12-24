@@ -1,4 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="colorSelected">#22FFFFFF</color>
+    <color name="gitAdded">#FF81FF47</color>
+    <color name="gitModified">#FFF7B613</color>
+    <color name="gitMoved">#FFFCFF5B</color>
+    <color name="transparent">#00FFDEAD</color>
 </resources>

@@ -22,7 +22,6 @@
 
     <style name="ApplicationTheme.FSListItemView" parent="ApplicationTheme.ListItem">
         <item name="android:drawablePadding">@dimen/drawable_text_padding</item>
-        <item name="android:drawableTint">@android:color/white</item>
     </style>
 
     <style name="ApplicationTheme.FSListViewEmptyFolder">
