@@ -16,11 +16,11 @@ import java.util.ArrayList
 import java.util.Stack
 
 import slak.gitforandroid.R
-import slak.gitforandroid.activities.RepoViewActivity
 
 class FSListView : ListView {
   companion object {
     const val TAG = "FSListView"
+    const val FILE_OPEN_REQ_CODE = 0xF11E
   }
 
   private var nodes: ArrayList<SelectableAdapterModel<File>>
@@ -111,7 +111,7 @@ class FSListView : ListView {
         val intent = Intent(Intent.ACTION_VIEW)
         val uri = Uri.parse("content://" + nodes[position].thing.absolutePath)
         intent.setDataAndType(uri, "text/plain")
-        activity.startActivity(intent)
+        activity.startActivityForResult(intent, FILE_OPEN_REQ_CODE)
       } else {
         Log.w(TAG, "Unhandled FSItemType!")
       }
@@ -157,6 +157,13 @@ class FSListView : ListView {
       // Lexicographic comparison of node names
       lhs.thing.name.toLowerCase().compareTo(rhs.thing.name.toLowerCase())
     }
+  }
+
+  /**
+   * Notify the adapter that the data was somehow changed externally.
+   */
+  fun update() {
+    listElements!!.notifyDataSetChanged()
   }
 
   /**

@@ -1,5 +1,6 @@
 package slak.gitforandroid.activities
 
+import android.content.Intent
 import android.os.Bundle
 import android.support.design.widget.FloatingActionButton
 import android.support.v7.app.AppCompatActivity
@@ -21,6 +22,8 @@ class RepoViewActivity : AppCompatActivity() {
 
   private var fab: FloatingActionButton? = null
   private var lv: FSListView? = null
+
+  private var fileDiffs: List<DiffEntry> = ArrayList()
 
   private fun inflateMenu(id: Int) {
     toolbar!!.menu.clear()
@@ -44,7 +47,6 @@ class RepoViewActivity : AppCompatActivity() {
     lv!!.onMultiSelectStart = { inflateMenu(R.menu.menu_multi_select) }
     lv!!.onMultiSelectEnd = { inflateMenu(R.menu.menu_repo_view) }
 
-    var fileDiffs: List<DiffEntry> = ArrayList()
     lv!!.onChildViewPrepare = cb@ {
       context: AppCompatActivity, file: File, convertView: View?, parent: ViewGroup ->
       val path = repo!!.relativize(file.toURI()).toString()
@@ -82,6 +84,17 @@ class RepoViewActivity : AppCompatActivity() {
     }
 
     supportActionBar!!.setDisplayHomeAsUpEnabled(true)
+  }
+
+  override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+    if (requestCode == FSListView.FILE_OPEN_REQ_CODE) {
+      repo!!.gitDiff { diffs ->
+        fileDiffs = diffs
+        lv!!.update()
+      }
+      return
+    }
+    super.onActivityResult(requestCode, resultCode, data)
   }
 
   private fun stageSelected() {
