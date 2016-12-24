@@ -7,8 +7,8 @@ import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
 import android.util.AttributeSet
 import org.eclipse.jgit.diff.DiffEntry
-import slak.gitforandroid.filesystem.FSAbstractListItem
-import slak.gitforandroid.filesystem.FSItemType
+import slak.fslistview.FSAbstractListItem
+import slak.fslistview.FSItemType
 
 enum class GitStatus {
   ADDED, MODIFIED, RENAMED, COPIED, NONE;

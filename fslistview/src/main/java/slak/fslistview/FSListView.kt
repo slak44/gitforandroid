@@ -1,8 +1,10 @@
-package slak.gitforandroid.filesystem
+package slak.fslistview
 
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.support.annotation.ColorRes
+import android.support.annotation.LayoutRes
 import android.support.v7.app.AppCompatActivity
 import android.util.AttributeSet
 import android.util.Log
@@ -15,8 +17,6 @@ import java.io.File
 import java.util.ArrayList
 import java.util.Stack
 
-import slak.gitforandroid.R
-
 class FSListView : ListView {
   companion object {
     const val TAG = "FSListView"
@@ -27,10 +27,11 @@ class FSListView : ListView {
   private var listElements: FSArrayAdapter? = null
   private var folderStack = Stack<SelectableAdapterModel<File>>()
   private var root: File? = null
+  private @LayoutRes var listLayout: Int? = null
 
   private var multiSelectState = false
 
-  internal val selectedPaths: ArrayList<String>
+  val selectedPaths: ArrayList<String>
     get() = SelectableAdapterModel.getSelectedModels(nodes).mapTo(ArrayList<String>()) {
       nodes[it].thing.toURI().relativize(root!!.toURI()).toString()
     }
@@ -38,27 +39,27 @@ class FSListView : ListView {
   /**
    * Called when an item is long-pressed.
    */
-  internal var onMultiSelectStart: () -> Unit = {}
+  var onMultiSelectStart: () -> Unit = {}
     set
   /**
    * Called when no more items are long-pressed.
    */
-  internal var onMultiSelectEnd: () -> Unit = {}
+  var onMultiSelectEnd: () -> Unit = {}
     set
   /**
    * Called when the folder at the top of the stack changes.
    */
-  internal var onFolderChange: (old: File, new: File) -> Unit = { old: File, new: File -> }
+  var onFolderChange: (old: File, new: File) -> Unit = { old: File, new: File -> }
     set
   /**
    * Called by the FSArrayAdapter for each view it needs to prepare. Implementations of this
    * function should try to recycle the given View? if it is possible, and inflate a new layout only
    * if necessary.
    */
-  internal var onChildViewPrepare: (AppCompatActivity, File, View?, ViewGroup) -> FSAbstractListItem
+  var onChildViewPrepare: (AppCompatActivity, File, View?, ViewGroup) -> FSAbstractListItem
       = { context: AppCompatActivity, file: File, convertView: View?, parent: ViewGroup ->
     if (convertView != null && convertView is FSAbstractListItem) convertView
-    else context.layoutInflater.inflate(R.layout.list_element, parent, false) as FSAbstractListItem
+    else context.layoutInflater.inflate(listLayout!!, parent, false) as FSAbstractListItem
   }
     set
 
@@ -74,13 +75,14 @@ class FSListView : ListView {
    * Populate the list with files from the given root.
    * @param root the root of the navigation
    */
-  fun init(activity: AppCompatActivity, root: File) {
+  fun init(activity: AppCompatActivity, root: File, @LayoutRes listElement: Int, @ColorRes selectedColor: Int) {
+    this.listLayout = listElement
     this.root = root
     // Don't bother doing anything in the editor
     if (isInEditMode) return
     folderStack.push(SelectableAdapterModel(root))
     updateNodes()
-    listElements = FSArrayAdapter(activity, R.layout.list_element_main, nodes, this)
+    listElements = FSArrayAdapter(activity, listElement, nodes, this)
     super.setAdapter(listElements)
     super.setOnItemClickListener(AdapterView.OnItemClickListener { parent, view, position, id ->
       // Directory empty, nothing to do here
@@ -99,7 +101,7 @@ class FSListView : ListView {
       } else if (multiSelectState) {
         nodes[position].selected = true
         view.setBackgroundColor(
-            resources.getColor(R.color.colorSelected, activity.theme))
+            resources.getColor(selectedColor, activity.theme))
         return@OnItemClickListener
       }
       if (view !is FSAbstractListItem) return@OnItemClickListener
@@ -124,7 +126,7 @@ class FSListView : ListView {
       if (SelectableAdapterModel.getSelectedModels(nodes).size == 0) onMultiSelectStart()
       nodes[position].selected = true
       view.setBackgroundColor(
-          resources.getColor(R.color.colorSelected, activity.theme))
+          resources.getColor(selectedColor, activity.theme))
       return@OnItemLongClickListener true
     }
   }

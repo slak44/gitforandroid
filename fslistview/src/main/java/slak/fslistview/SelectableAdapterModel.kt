@@ -1,4 +1,4 @@
-package slak.gitforandroid.filesystem
+package slak.fslistview
 
 import java.util.ArrayList
 

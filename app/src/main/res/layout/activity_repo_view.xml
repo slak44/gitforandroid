@@ -33,7 +33,7 @@
         tools:context=".activities.RepoViewActivity"
         tools:showIn="@layout/activity_repo_view">
 
-        <slak.gitforandroid.filesystem.FSListView
+        <slak.fslistview.FSListView
             android:id="@+id/current_directory"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>

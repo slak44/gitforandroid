@@ -1,4 +1,4 @@
-package slak.gitforandroid.filesystem
+package slak.fslistview
 
 import android.support.annotation.LayoutRes
 import android.support.v7.app.AppCompatActivity

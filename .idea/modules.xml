@@ -4,6 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/GitForAndroid.iml" filepath="$PROJECT_DIR$/GitForAndroid.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/fslistview/fslistview.iml" filepath="$PROJECT_DIR$/fslistview/fslistview.iml" />
     </modules>
   </component>
 </project>

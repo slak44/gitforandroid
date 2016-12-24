@@ -5,14 +5,13 @@ import android.os.Bundle
 import android.support.design.widget.FloatingActionButton
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import org.eclipse.jgit.diff.DiffEntry
+import slak.fslistview.FSListView
 import slak.gitforandroid.*
-import slak.gitforandroid.filesystem.FSListView
 import java.io.File
 import java.util.*
 
@@ -75,7 +74,7 @@ class RepoViewActivity : AppCompatActivity() {
 
     repo!!.gitDiff { diffs ->
       fileDiffs = diffs
-      lv!!.init(this, repo!!.repoFolder)
+      lv!!.init(this, repo!!.repoFolder, R.layout.list_element, R.color.colorSelected)
     }
 
     fab = findViewById(R.id.fab) as FloatingActionButton
