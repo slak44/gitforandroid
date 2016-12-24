@@ -210,10 +210,10 @@ class Repository(private val context: AppCompatActivity, name: String) {
     }, callback).execute()
   }
 
-  fun gitDiffCached(callback: (List<DiffEntry>) -> Unit) {
+  fun gitDiff(callback: (List<DiffEntry>) -> Unit) {
     var diffs: List<DiffEntry>? = null
     SafeAsyncTask({
-      diffs = git.diff().setCached(true).setShowNameAndStatusOnly(true).call()
+      diffs = git.diff().setCached(false).setShowNameAndStatusOnly(true).call()
     }, { completedTask: SafeAsyncTask ->
       if (completedTask.exception != null) {
         reportError(context, R.string.error_diff_failed, completedTask.exception!!)

@@ -4,11 +4,15 @@ import android.os.Bundle
 import android.support.design.widget.FloatingActionButton
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import org.eclipse.jgit.diff.DiffEntry
 import slak.gitforandroid.*
+import slak.gitforandroid.filesystem.FSListItemView
 import slak.gitforandroid.filesystem.FSListView
+import java.util.*
 
 class RepoViewActivity : AppCompatActivity() {
   private var toolbar: Toolbar? = null
@@ -36,10 +40,10 @@ class RepoViewActivity : AppCompatActivity() {
     repo = Repository(this, intent.getStringExtra(MainActivity.INTENT_REPO_NAME))
 
     lv = findViewById(R.id.current_directory) as FSListView
-    lv!!.init(this, repo!!.repoFolder)
     lv!!.onMultiSelectStart = { inflateMenu(R.menu.menu_multi_select) }
     lv!!.onMultiSelectEnd = { inflateMenu(R.menu.menu_repo_view) }
 
+    var fileDiffs: List<DiffEntry> = ArrayList()
     val emptyFolderText = findViewById(R.id.repo_view_empty_folder)!!
     lv!!.onFolderChange = { old, new ->
       if (new.list().isEmpty()) {
@@ -47,6 +51,19 @@ class RepoViewActivity : AppCompatActivity() {
       } else {
         emptyFolderText.visibility = View.GONE
       }
+      val paths = new.list()
+      fileDiffs.forEach { diff ->
+        paths.withIndex().forEach { path ->
+          if (path.value == diff.newPath) {
+            // TODO: update the view for this file with the diff here
+          }
+        }
+      }
+    }
+
+    repo!!.gitDiff { diffs ->
+      fileDiffs = diffs
+      lv!!.init(this, repo!!.repoFolder)
     }
 
     fab = findViewById(R.id.fab) as FloatingActionButton
