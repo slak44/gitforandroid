@@ -28,13 +28,18 @@ class FSListView : ListView {
   private var root: File? = null
   private @LayoutRes var listLayout: Int? = null
 
-  private var multiSelectState = false
+  private var isMultiSelecting = false
 
   val selectedPaths: ArrayList<String>
     get() = SelectableAdapterModel.getSelectedModels(nodes).mapTo(ArrayList<String>()) {
       nodes[it].thing.toURI().relativize(root!!.toURI()).toString()
     }
 
+  /**
+   * Set to false to disable multi-select functionality
+   */
+  var useMultiSelect = true
+    get set
   /**
    * Called when an item is long-pressed.
    */
@@ -82,26 +87,28 @@ class FSListView : ListView {
     folderStack.push(SelectableAdapterModel(root))
     updateNodes()
     listElements = FSArrayAdapter(activity, listElement, nodes, this)
-    super.setAdapter(listElements)
-    super.setOnItemClickListener(AdapterView.OnItemClickListener { parent, view, position, id ->
+    adapter = listElements
+    onItemClickListener = AdapterView.OnItemClickListener { parent, view, position, id ->
       // Directory empty, nothing to do here
       if (nodes.size == 0) return@OnItemClickListener
-      // Clicked on a selected item: deselect it
-      if (nodes[position].selected && multiSelectState) {
-        nodes[position].selected = false
-        view.background = this.background
-        // No more items are selected: reset the style of the toolbar
-        if (SelectableAdapterModel.getSelectedModels(nodes).size == 0) {
-          multiSelectState = false
-          onMultiSelectEnd()
+      if (useMultiSelect) {
+        // Clicked on a selected item: deselect it
+        if (nodes[position].selected && isMultiSelecting) {
+          nodes[position].selected = false
+          view.background = this.background
+          // No more items are selected: reset the style of the toolbar
+          if (SelectableAdapterModel.getSelectedModels(nodes).size == 0) {
+            isMultiSelecting = false
+            onMultiSelectEnd()
+          }
+          return@OnItemClickListener
+          // Clicked on a unselected item in multi-select: select it
+        } else if (isMultiSelecting) {
+          nodes[position].selected = true
+          view.setBackgroundColor(
+              resources.getColor(selectedColor, activity.theme))
+          return@OnItemClickListener
         }
-        return@OnItemClickListener
-        // Clicked on a unselected item in multi-select: select it
-      } else if (multiSelectState) {
-        nodes[position].selected = true
-        view.setBackgroundColor(
-            resources.getColor(selectedColor, activity.theme))
-        return@OnItemClickListener
       }
       if (view !is FSAbstractListItem) return@OnItemClickListener
       if (view.type == FSItemType.FOLDER) {
@@ -113,17 +120,19 @@ class FSListView : ListView {
       } else {
         Log.w(TAG, "Unhandled FSItemType!")
       }
-    })
-    this.onItemLongClickListener = AdapterView.OnItemLongClickListener {
+    }
+    onItemLongClickListener = AdapterView.OnItemLongClickListener {
       parent, view, position, id ->
-      if (view !is FSAbstractListItem) return@OnItemLongClickListener false
-      multiSelectState = true
-      // No item was checked: style the toolbar for multi-select
-      if (SelectableAdapterModel.getSelectedModels(nodes).size == 0) onMultiSelectStart()
-      nodes[position].selected = true
-      view.setBackgroundColor(
-          resources.getColor(selectedColor, activity.theme))
-      return@OnItemLongClickListener true
+      if (useMultiSelect) {
+        isMultiSelecting = true
+        // No item was checked: style the toolbar for multi-select
+        if (SelectableAdapterModel.getSelectedModels(nodes).size == 0) onMultiSelectStart()
+        nodes[position].selected = true
+        view.setBackgroundColor(
+            resources.getColor(selectedColor, activity.theme))
+        return@OnItemLongClickListener true
+      }
+      return@OnItemLongClickListener false
     }
   }
 
