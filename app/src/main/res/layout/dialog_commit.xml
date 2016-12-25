@@ -1,41 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:orientation="vertical"
               android:layout_width="match_parent"
               android:layout_height="wrap_content"
+              android:orientation="vertical"
               android:padding="?android:attr/dialogPreferredPadding">
 
     <EditText
+        android:id="@+id/dialog_commit_message"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/dialog_commit_message"
         android:layout_gravity="center_horizontal"
         android:hint="@string/dialog_commit_message_hint"
         />
 
     <Switch
+        android:id="@+id/dialog_commit_substitute"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/dialog_commit_substitute_switch"
-        android:id="@+id/dialog_commit_substitute"
-        android:layout_gravity="center"/>
+        android:layout_gravity="center"
+        android:text="@string/dialog_commit_substitute_switch"/>
 
     <EditText
+        android:id="@+id/dialog_commit_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:inputType="textPersonName"
         android:ems="10"
-        android:id="@+id/dialog_commit_name"
         android:hint="@string/dialog_commit_su_name_hint"
+        android:inputType="textPersonName"
         android:visibility="gone"/>
 
     <EditText
+        android:id="@+id/dialog_commit_email"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:inputType="textEmailAddress"
         android:ems="10"
-        android:id="@+id/dialog_commit_email"
         android:hint="@string/dialog_commit_su_email_hint"
+        android:inputType="textEmailAddress"
         android:visibility="gone"/>
 
 </LinearLayout>
