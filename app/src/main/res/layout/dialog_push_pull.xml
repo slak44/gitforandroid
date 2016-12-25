@@ -15,8 +15,9 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_gravity="center"
-            android:elegantTextHeight="false"
+            android:elegantTextHeight="true"
             android:gravity="end"
+            android:layout_marginBottom="@dimen/switch_padding"
             android:text="@string/dialog_push_pull_switch_existing_remote"/>
 
     </LinearLayout>

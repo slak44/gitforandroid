@@ -34,10 +34,10 @@ fun commitDialog(context: AppCompatActivity, target: Repository): AlertDialog {
     var emailString: String? = null
     if (!name.text.toString().isEmpty()) nameString = name.text.toString()
     if (!email.text.toString().isEmpty()) emailString = email.text.toString()
-    target.gitCommit(nameString, emailString, message.text.toString(),{
+    target.gitCommit(nameString, emailString, message.text.toString(), {
       completedTask: SafeAsyncTask ->
       if (completedTask.exception != null) {
-        reportError(dialogView, R.string.error_commit_failed, completedTask.exception!!)
+        reportError(context, R.string.error_commit_failed, completedTask.exception!!)
         return@gitCommit
       }
       Snackbar.make(
@@ -134,11 +134,11 @@ fun pushPullDialog(
 
     val gitActionCallback: (SafeAsyncTask) -> Unit = cb@ { completedTask: SafeAsyncTask ->
       if (completedTask.exception != null) {
-        reportError(dialogView, failSnackRes, completedTask.exception!!)
+        reportError(context, failSnackRes, completedTask.exception!!)
         return@cb
       }
       Snackbar.make(
-          dialogView,
+          rootActivityView(context),
           context.resources.getString(successSnackRes, remote),
           Snackbar.LENGTH_LONG
       ).show()

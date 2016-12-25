@@ -225,7 +225,7 @@ class Repository(private val context: AppCompatActivity, name: String) {
   }
 
   fun listRemotes(): Array<out String> {
-    return File(repoFolder, ".git/refs/remotes").list()
+    return File(repoFolder, ".git/refs/remotes").list() ?: arrayOf()
   }
 
   fun relativize(path: URI): URI {

@@ -21,8 +21,8 @@ import java.util.*
 
 fun reportError(view: View, @StringRes strRes: Int, e: Exception, type: String = "Error") {
   when (type) {
-    "WTF" -> Log.wtf("ErrorReporter", view.resources.getString(strRes), e)
-    else -> Log.e("ErrorReporter", view.resources.getString(strRes), e)
+    "WTF" -> Log.wtf("GitForAndroid", view.resources.getString(strRes), e)
+    else -> Log.e("GitForAndroid", view.resources.getString(strRes), e)
   }
   // TODO: make 'more' button on snack, to lead to err text
   Snackbar.make(view, strRes, Snackbar.LENGTH_LONG).show()
