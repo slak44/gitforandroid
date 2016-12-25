@@ -20,7 +20,6 @@ import java.util.Stack
 class FSListView : ListView {
   companion object {
     const val TAG = "FSListView"
-    const val FILE_OPEN_REQ_CODE = 0xF11E
   }
 
   private var nodes: ArrayList<SelectableAdapterModel<File>>
@@ -40,17 +39,18 @@ class FSListView : ListView {
    * Called when an item is long-pressed.
    */
   var onMultiSelectStart: () -> Unit = {}
-    set
   /**
    * Called when no more items are long-pressed.
    */
   var onMultiSelectEnd: () -> Unit = {}
-    set
   /**
    * Called when the folder at the top of the stack changes.
    */
   var onFolderChange: (old: File, new: File) -> Unit = { old: File, new: File -> }
-    set
+  /**
+   * Called when a file is opened by the user.
+   */
+  var onFileOpen: (File) -> Unit = {}
   /**
    * Called by the FSArrayAdapter for each view it needs to prepare. Implementations of this
    * function should try to recycle the given View? if it is possible, and inflate a new layout only
@@ -61,7 +61,6 @@ class FSListView : ListView {
     if (convertView != null && convertView is FSAbstractListItem) convertView
     else context.layoutInflater.inflate(listLayout!!, parent, false) as FSAbstractListItem
   }
-    set
 
   init {
     nodes = ArrayList<SelectableAdapterModel<File>>()
@@ -110,10 +109,7 @@ class FSListView : ListView {
         updateNodes()
         listElements!!.notifyDataSetChanged()
       } else if (view.type == FSItemType.FILE) {
-        val intent = Intent(Intent.ACTION_VIEW)
-        val uri = Uri.parse("content://" + nodes[position].thing.absolutePath)
-        intent.setDataAndType(uri, "text/plain")
-        activity.startActivityForResult(intent, FILE_OPEN_REQ_CODE)
+        onFileOpen(nodes[position].thing)
       } else {
         Log.w(TAG, "Unhandled FSItemType!")
       }

@@ -1,6 +1,7 @@
 package slak.gitforandroid.activities
 
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.support.design.widget.FloatingActionButton
 import android.support.v7.app.AppCompatActivity
@@ -16,6 +17,10 @@ import java.io.File
 import java.util.*
 
 class RepoViewActivity : AppCompatActivity() {
+  companion object {
+    const val FILE_OPEN_REQ_CODE = 0xF11E
+  }
+
   private var toolbar: Toolbar? = null
   private var repo: Repository? = null
 
@@ -72,6 +77,13 @@ class RepoViewActivity : AppCompatActivity() {
       }
     }
 
+    lv!!.onFileOpen = { file ->
+      val intent = Intent(Intent.ACTION_VIEW)
+      val uri = Uri.parse("content://" + file.absolutePath)
+      intent.setDataAndType(uri, "text/plain")
+      startActivityForResult(intent, FILE_OPEN_REQ_CODE)
+    }
+
     repo!!.gitDiff { diffs ->
       fileDiffs = diffs
       lv!!.init(this, repo!!.repoFolder, R.layout.list_element, R.color.colorSelected)
@@ -86,7 +98,7 @@ class RepoViewActivity : AppCompatActivity() {
   }
 
   override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-    if (requestCode == FSListView.FILE_OPEN_REQ_CODE) {
+    if (requestCode == FILE_OPEN_REQ_CODE) {
       repo!!.gitDiff { diffs ->
         fileDiffs = diffs
         lv!!.update()
