@@ -1,35 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:orientation="vertical"
               android:layout_width="match_parent"
-              android:layout_height="match_parent">
+              android:layout_height="match_parent"
+              android:orientation="vertical"
+              android:padding="?android:attr/dialogPreferredPadding">
 
     <LinearLayout
-        android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
 
         <EditText
+            android:id="@+id/repo_add_dialog_name"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:id="@+id/repo_add_dialog_name"
+            android:layout_weight="3"
             android:hint="@string/dialog_add_repo_name_hint"
-            android:paddingTop="16dp"
             android:paddingBottom="16dp"
-            android:layout_weight="3"/>
+            android:paddingTop="16dp"/>
 
         <Switch
+            android:id="@+id/repo_add_dialog_clone"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/dialog_add_repo_clone_switch"
-            android:id="@+id/repo_add_dialog_clone"
             />
     </LinearLayout>
 
     <EditText
+        android:id="@+id/repo_add_dialog_cloneURL"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/repo_add_dialog_cloneURL"
         android:hint="@string/dialog_add_repo_cloneURL_hint"
         android:inputType="textUri"
         android:visibility="gone"/>
