@@ -1,4 +1,4 @@
-package slak.gitforandroid.activities
+package slak.gitforandroid
 
 import android.app.AlertDialog
 import android.content.Context

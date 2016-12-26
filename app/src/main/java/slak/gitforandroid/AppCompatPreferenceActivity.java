@@ -1,4 +1,4 @@
-package slak.gitforandroid.activities;
+package slak.gitforandroid;
 
 import android.content.res.Configuration;
 import android.os.Bundle;

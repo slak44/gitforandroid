@@ -3,7 +3,7 @@
     <!-- These settings headers are only used on tablets. -->
 
     <header
-        android:fragment="slak.gitforandroid.activities.SettingsActivity$GeneralPreferenceFragment"
+        android:fragment="slak.gitforandroid.SettingsActivity$GeneralPreferenceFragment"
         android:icon="@drawable/white_ic_info_24dp"
         android:title="@string/pref_header_git"/>
 

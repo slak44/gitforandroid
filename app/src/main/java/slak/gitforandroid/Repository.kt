@@ -12,9 +12,9 @@ import org.eclipse.jgit.diff.DiffEntry
 import org.eclipse.jgit.lib.PersonIdent
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider
-import slak.gitforandroid.activities.getStringSetting
-import slak.gitforandroid.activities.reportError
-import slak.gitforandroid.activities.rootActivityView
+import slak.gitforandroid.getStringSetting
+import slak.gitforandroid.reportError
+import slak.gitforandroid.rootActivityView
 import java.io.File
 import java.net.URI
 import java.util.*

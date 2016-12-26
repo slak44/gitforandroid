@@ -5,8 +5,8 @@ import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
 import android.view.View
 import android.widget.*
-import slak.gitforandroid.activities.reportError
-import slak.gitforandroid.activities.rootActivityView
+import slak.gitforandroid.reportError
+import slak.gitforandroid.rootActivityView
 
 fun commitDialog(context: AppCompatActivity, target: Repository): AlertDialog {
   val dialogView: View = context.layoutInflater.inflate(R.layout.dialog_commit, null)

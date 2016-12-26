@@ -1,4 +1,4 @@
-package slak.gitforandroid.activities
+package slak.gitforandroid
 
 import android.content.Intent
 import android.net.Uri
@@ -150,18 +150,18 @@ class RepoViewActivity : AppCompatActivity() {
         // 3. Commit
         // 4. Push to origin
         passwordDialog(this, { pass: String ->
-          val gitPushCb = Repository.callbackFactory(
+          val gitPushCb = Repository.Companion.callbackFactory(
               fab!!,
               R.string.error_push_failed,
               R.string.snack_item_push_success
           )
-          val gitQCommitCb = Repository.callbackFactory(
+          val gitQCommitCb = Repository.Companion.callbackFactory(
               fab!!,
               R.string.error_commit_failed,
               R.string.snack_item_commit_success,
               { repo!!.gitPush("origin", pass, gitPushCb) }
           )
-          val gitAddCb = Repository.callbackFactory(
+          val gitAddCb = Repository.Companion.callbackFactory(
               fab!!,
               R.string.error_add_failed,
               R.string.snack_item_stage_all_success,

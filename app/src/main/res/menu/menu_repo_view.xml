@@ -3,7 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context=".activities.RepoViewActivity">
+    tools:context=".RepoViewActivity">
 
     <item
         android:id="@+id/menu_repo_view_action_push"
