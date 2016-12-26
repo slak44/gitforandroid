@@ -48,6 +48,18 @@ class MainActivity : AppCompatActivity() {
   internal var repoNames: ArrayList<String> = ArrayList()
   internal var listElements: ArrayAdapter<String>? = null
 
+  private fun addRepoNames() {
+    repoNames.clear()
+    repoNames.addAll(Arrays.asList(*Repository.getRepoDirectory(this).list()))
+    repoNames.sort()
+  }
+
+  override fun onResume() {
+    addRepoNames()
+    listElements!!.notifyDataSetChanged()
+    super.onResume()
+  }
+
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     setContentView(R.layout.activity_main)
@@ -70,8 +82,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     val repoList = findViewById(R.id.repoList) as ListView
-    repoNames = ArrayList<String>()
-    repoNames.addAll(Arrays.asList(*Repository.getRepoDirectory(this).list()))
+    addRepoNames()
     listElements = ArrayAdapter(this, R.layout.list_element_main, repoNames)
     repoList.adapter = listElements
     repoList.setOnItemClickListener { parent: AdapterView<*>, view, position: Int, id: Long ->
