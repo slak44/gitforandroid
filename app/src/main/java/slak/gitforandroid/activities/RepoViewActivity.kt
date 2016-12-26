@@ -45,7 +45,9 @@ class RepoViewActivity : AppCompatActivity() {
     toolbar = findViewById(R.id.toolbar) as Toolbar
     setSupportActionBar(toolbar)
 
-    repo = Repository(this, intent.getStringExtra(MainActivity.INTENT_REPO_NAME))
+    val repoName = intent.getStringExtra(MainActivity.INTENT_REPO_NAME)
+    toolbar!!.subtitle = repoName
+    repo = Repository(this, repoName)
 
     lv = findViewById(R.id.current_directory) as FSListView
     lv!!.onMultiSelectStart = { inflateMenu(R.menu.menu_multi_select) }
