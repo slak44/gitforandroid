@@ -122,7 +122,7 @@ class MainActivity : AppCompatActivity() {
         if (cloneURLExists) R.string.snack_clone_success else R.string.snack_init_success,
         {
           repoNames.add(newRepoName)
-          listElements?.notifyDataSetChanged()
+          listElements!!.notifyDataSetChanged()
         }
     )
     if (cloneURLExists) {
