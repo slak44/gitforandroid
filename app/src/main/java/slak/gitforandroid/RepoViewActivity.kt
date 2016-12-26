@@ -4,12 +4,18 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.support.design.widget.FloatingActionButton
+import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
+import android.text.Editable
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
+import android.widget.EditText
+import android.widget.Switch
+import android.widget.Toast
 import org.eclipse.jgit.diff.DiffEntry
 import slak.fslistview.FSListView
 import slak.gitforandroid.*
@@ -32,6 +38,46 @@ class RepoViewActivity : AppCompatActivity() {
   private fun inflateMenu(id: Int) {
     toolbar!!.menu.clear()
     this.menuInflater.inflate(id, toolbar!!.menu)
+  }
+
+  private fun repoSettingsDialog() {
+    val layout = layoutInflater.inflate(R.layout.dialog_repo_settings, null)
+    val builder = AlertDialog.Builder(this)
+    builder
+        .setTitle(R.string.dialog_repo_settings_title)
+        .setView(layout)
+    val dialog = builder.create()
+    dialog.show()
+    val renameEditText = layout.findViewById(R.id.dialog_repo_settings_rename) as EditText
+    renameEditText.setText(toolbar!!.subtitle)
+    (layout.findViewById(R.id.dialog_repo_settings_btn_rename) as Button)
+        .setOnClickListener {
+          if (renameEditText.text.isBlank()) {
+            renameEditText.error = getString(R.string.error_field_blank)
+            return@setOnClickListener
+          }
+          val target = File(Repository.getRepoDirectory(this), renameEditText.text.toString())
+          if (target.exists()) {
+            renameEditText.error = getString(R.string.error_repo_name_conflict)
+            return@setOnClickListener
+          }
+          val renameResult = repo!!.repoFolder.renameTo(target)
+          if (!renameResult) {
+            renameEditText.error = getString(R.string.error_rename_failed)
+            return@setOnClickListener
+          }
+          toolbar!!.subtitle = renameEditText.text
+          dialog.dismiss()
+        }
+    val deleteBtn = layout.findViewById(R.id.dialog_repo_settings_btn_delete) as Button
+    (layout.findViewById(R.id.dialog_repo_settings_sw_enable_delete) as Switch)
+        .setOnCheckedChangeListener { button, isChecked ->
+          deleteBtn.isEnabled = isChecked
+        }
+    deleteBtn.setOnClickListener {
+      repo!!.repoFolder.deleteRecursively()
+      this@RepoViewActivity.finish()
+    }
   }
 
   override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -137,6 +183,7 @@ class RepoViewActivity : AppCompatActivity() {
   override fun onOptionsItemSelected(item: MenuItem): Boolean {
     when (item.itemId) {
       android.R.id.home -> onBackPressed() // Behave like the hardware back button
+      R.id.menu_repo_view_action_settings -> repoSettingsDialog()
       R.id.menu_repo_view_action_push -> pushPullDialog(this, repo!!, RemoteOp.PUSH)
       R.id.menu_repo_view_action_pull -> pushPullDialog(this, repo!!, RemoteOp.PULL)
       R.id.menu_repo_view_action_stage -> stageSelected()

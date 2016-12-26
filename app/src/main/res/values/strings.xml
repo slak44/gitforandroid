@@ -16,10 +16,12 @@
     <string name="error_diff_failed">Failed to get repository diff</string>
     <string name="error_push_failed">Failed to push branch</string>
     <string name="error_pull_failed">Failed to pull branch</string>
+    <string name="error_rename_failed">Failed to rename</string>
     <string name="error_io_failed">Filesystem error</string>
-    <string name="error_repo_name_conflict">A repository with this name already exists</string>
+    <string name="error_repo_name_conflict">This repository already exists</string>
     <string name="error_need_clone_URI">Target URI required for cloning</string>
     <string name="error_storage_unavailable">Filesystem unavailable</string>
+    <string name="error_field_blank">Cannot be empty</string>
 
     <!-- Main activity menu -->
     <string name="menu_main_settings">Settings</string>
@@ -80,6 +82,12 @@
     <string name="dialog_pass_data_hint">Password</string>
     <string name="dialog_pass_cancel">Cancel</string>
     <string name="dialog_pass_confirm">Send</string>
+
+    <!-- Repo settings dialog -->
+    <string name="dialog_repo_settings_title">Repository Settings</string>
+    <string name="dialog_repo_settings_rename">Rename</string>
+    <string name="dialog_repo_settings_enable_delete">Enable Delete</string>
+    <string name="dialog_repo_settings_delete">Delete</string>
 
     <!-- Empty folder text -->
     <string name="folder_empty_repo_view">There is nothing here</string>
