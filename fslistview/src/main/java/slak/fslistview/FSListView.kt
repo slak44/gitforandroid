@@ -1,8 +1,6 @@
 package slak.fslistview
 
 import android.content.Context
-import android.content.Intent
-import android.net.Uri
 import android.support.annotation.ColorRes
 import android.support.annotation.LayoutRes
 import android.support.v7.app.AppCompatActivity
@@ -85,9 +83,10 @@ class FSListView : ListView {
     // Don't bother doing anything in the editor
     if (isInEditMode) return
     folderStack.push(SelectableAdapterModel(root))
-    updateNodes()
     listElements = FSArrayAdapter(activity, listElement, nodes, this)
     adapter = listElements
+    refresh()
+    fireFolderChangeEvents()
     onItemClickListener = AdapterView.OnItemClickListener { parent, view, position, id ->
       // Directory empty, nothing to do here
       if (nodes.size == 0) return@OnItemClickListener
@@ -113,8 +112,8 @@ class FSListView : ListView {
       if (view !is FSAbstractListItem) return@OnItemClickListener
       if (view.type == FSItemType.FOLDER) {
         folderStack.push(nodes[position])
-        updateNodes()
-        listElements!!.notifyDataSetChanged()
+        refresh()
+        fireFolderChangeEvents()
       } else if (view.type == FSItemType.FILE) {
         onFileOpen(nodes[position].thing)
       } else {
@@ -136,13 +135,7 @@ class FSListView : ListView {
     }
   }
 
-  /**
-   * Updates the nodes array based on the top of the folderStack.
-   */
-  private fun updateNodes() {
-    nodes.clear()
-    nodes.addAll(SelectableAdapterModel.fromArray(folderStack.peek().thing.listFiles()))
-
+  private fun fireFolderChangeEvents() {
     // Little hack to get the old directory for the folder change
     if (folderStack.size > 1) {
       val topOfStack = folderStack.peek()
@@ -152,6 +145,27 @@ class FSListView : ListView {
     } else if (folderStack.size == 1) {
       onFolderChange(folderStack.peek().thing, folderStack.peek().thing)
     }
+  }
+
+  /**
+   * Get the currently displayed directory.
+   */
+  val currentDirectory: File
+    get() = folderStack.peek().thing
+
+  /**
+   * Notify the adapter that the data was somehow changed externally.
+   */
+  fun update() {
+    listElements!!.notifyDataSetChanged()
+  }
+
+  /**
+   * Re-add the files in the current directory, and update the views.
+   */
+  fun refresh() {
+    nodes.clear()
+    nodes.addAll(SelectableAdapterModel.fromArray(folderStack.peek().thing.listFiles()))
 
     nodes.sort { lhs, rhs ->
       // Directories before files
@@ -164,12 +178,7 @@ class FSListView : ListView {
       // Lexicographic comparison of node names
       lhs.thing.name.toLowerCase().compareTo(rhs.thing.name.toLowerCase())
     }
-  }
 
-  /**
-   * Notify the adapter that the data was somehow changed externally.
-   */
-  fun update() {
     listElements!!.notifyDataSetChanged()
   }
 
@@ -183,8 +192,7 @@ class FSListView : ListView {
       return false
     } else {
       folderStack.pop()
-      updateNodes()
-      listElements!!.notifyDataSetChanged()
+      refresh()
     }
     return true
   }
