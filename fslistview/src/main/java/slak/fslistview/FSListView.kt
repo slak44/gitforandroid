@@ -189,6 +189,7 @@ class FSListView : ListView {
     } else {
       folderStack.pop()
       refresh()
+      fireFolderChangeEvents()
     }
     return true
   }
