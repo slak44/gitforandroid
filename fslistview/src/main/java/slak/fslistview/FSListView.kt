@@ -20,7 +20,7 @@ class FSListView : ListView {
     const val TAG = "FSListView"
   }
 
-  private var nodes: ArrayList<SelectableAdapterModel<File>>
+  private var nodes: ArrayList<SelectableAdapterModel<File>> = ArrayList()
   private var listElements: FSArrayAdapter? = null
   private var folderStack = Stack<SelectableAdapterModel<File>>()
   private var root: File? = null
@@ -65,13 +65,9 @@ class FSListView : ListView {
     else context.layoutInflater.inflate(listLayout!!, parent, false) as FSAbstractListItem
   }
 
-  init {
-    nodes = ArrayList<SelectableAdapterModel<File>>()
-  }
-
-  constructor(context: Context) : this(context, null) {}
-  constructor(context: Context, set: AttributeSet?) : super(context, set) {}
-  constructor(context: Context, set: AttributeSet, defStyle: Int) : super(context, set, defStyle) {}
+  constructor(context: Context) : this(context, null)
+  constructor(context: Context, set: AttributeSet?) : super(context, set)
+  constructor(context: Context, set: AttributeSet, defStyle: Int) : super(context, set, defStyle)
 
   /**
    * Populate the list with files from the given root.
