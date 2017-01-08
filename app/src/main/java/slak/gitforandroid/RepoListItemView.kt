@@ -25,9 +25,9 @@ enum class GitStatus {
 }
 
 class RepoListItemView : FSAbstractListItem {
-  constructor(context: Context) : super(context) {}
-  constructor(context: Context, set: AttributeSet) : super(context, set) {}
-  constructor(context: Context, set: AttributeSet, defStyle: Int) : super(context, set, defStyle) {}
+  constructor(context: Context) : super(context)
+  constructor(context: Context, set: AttributeSet) : super(context, set)
+  constructor(context: Context, set: AttributeSet, defStyle: Int) : super(context, set, defStyle)
 
   private fun getTypeDrawable(): Drawable {
     val drawable = when (type) {
