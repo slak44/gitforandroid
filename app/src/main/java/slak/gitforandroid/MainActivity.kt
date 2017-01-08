@@ -33,7 +33,7 @@ fun reportError(activity: AppCompatActivity, @StringRes strRes: Int, e: Exceptio
 }
 
 fun rootActivityView(activity: AppCompatActivity): View {
-  return activity.window.decorView.rootView
+  return activity.findViewById(android.R.id.content)
 }
 
 fun getStringSetting(context: Context, key: String): String {

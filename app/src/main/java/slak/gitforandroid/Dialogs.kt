@@ -8,7 +8,7 @@ import android.widget.*
 import slak.gitforandroid.reportError
 import slak.gitforandroid.rootActivityView
 
-fun commitDialog(context: AppCompatActivity, target: Repository): AlertDialog {
+fun commitDialog(context: AppCompatActivity, target: Repository, snack: View): AlertDialog {
   val dialogView: View = context.layoutInflater.inflate(R.layout.dialog_commit, null)
   val builder: AlertDialog.Builder = AlertDialog.Builder(context)
   builder
@@ -41,7 +41,7 @@ fun commitDialog(context: AppCompatActivity, target: Repository): AlertDialog {
         return@gitCommit
       }
       Snackbar.make(
-          rootActivityView(context),
+          snack,
           context.resources.getString(R.string.snack_item_commit_success, message.text.toString()),
           Snackbar.LENGTH_LONG
       ).setAction(R.string.snack_action_revert_commit, null).show()

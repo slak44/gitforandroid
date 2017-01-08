@@ -139,7 +139,7 @@ class RepoViewActivity : AppCompatActivity() {
 
     fab = findViewById(R.id.fab) as FloatingActionButton
     fab!!.setOnClickListener {
-      commitDialog(this@RepoViewActivity, repo!!)
+      commitDialog(this@RepoViewActivity, repo!!, fab!!)
     }
 
     supportActionBar!!.setDisplayHomeAsUpEnabled(true)
