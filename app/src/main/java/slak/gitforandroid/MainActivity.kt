@@ -19,21 +19,13 @@ import slak.gitforandroid.R
 import slak.gitforandroid.Repository
 import java.util.*
 
-fun reportError(view: View, @StringRes strRes: Int, e: Exception, type: String = "Error") {
+fun reportError(snack: View, @StringRes strRes: Int, e: Exception, type: String = "Error") {
   when (type) {
-    "WTF" -> Log.wtf("GitForAndroid", view.resources.getString(strRes), e)
-    else -> Log.e("GitForAndroid", view.resources.getString(strRes), e)
+    "WTF" -> Log.wtf("GitForAndroid", snack.resources.getString(strRes), e)
+    else -> Log.e("GitForAndroid", snack.resources.getString(strRes), e)
   }
   // TODO: make 'more' button on snack, to lead to err text
-  Snackbar.make(view, strRes, Snackbar.LENGTH_LONG).show()
-}
-
-fun reportError(activity: AppCompatActivity, @StringRes strRes: Int, e: Exception, type: String = "Error") {
-  reportError(rootActivityView(activity), strRes, e, type)
-}
-
-fun rootActivityView(activity: AppCompatActivity): View {
-  return activity.findViewById(android.R.id.content)
+  Snackbar.make(snack, strRes, Snackbar.LENGTH_LONG).show()
 }
 
 fun getStringSetting(context: Context, key: String): String {
@@ -47,6 +39,8 @@ class MainActivity : AppCompatActivity() {
 
   internal var repoNames: ArrayList<String> = ArrayList()
   internal var listElements: ArrayAdapter<String>? = null
+
+  private var fab: FloatingActionButton? = null
 
   private fun addRepoNames() {
     repoNames.clear()
@@ -91,8 +85,8 @@ class MainActivity : AppCompatActivity() {
       startActivity(repoViewIntent)
     }
 
-    val fab = findViewById(R.id.fab) as FloatingActionButton
-    fab.setOnClickListener {
+    fab = findViewById(R.id.fab) as FloatingActionButton
+    fab!!.setOnClickListener {
       val newRepo = AlertDialog.Builder(this@MainActivity)
       val inflater = this@MainActivity.layoutInflater
       val dialogView = inflater.inflate(R.layout.dialog_add_repo, null)
@@ -146,9 +140,9 @@ class MainActivity : AppCompatActivity() {
         cloneURLEditText.error = null
       }
       // TODO: maybe add a progress bar or something
-      newRepo.gitClone(cloneURL, creationCallback)
+      newRepo.gitClone(fab!!, cloneURL, creationCallback)
     } else {
-      newRepo.gitInit(creationCallback)
+      newRepo.gitInit(fab!!, creationCallback)
     }
     dialog.dismiss()
   }

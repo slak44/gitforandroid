@@ -5,8 +5,6 @@ import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
 import android.view.View
 import android.widget.*
-import slak.gitforandroid.reportError
-import slak.gitforandroid.rootActivityView
 
 fun commitDialog(context: AppCompatActivity, target: Repository, snack: View): AlertDialog {
   val dialogView: View = context.layoutInflater.inflate(R.layout.dialog_commit, null)
@@ -37,7 +35,7 @@ fun commitDialog(context: AppCompatActivity, target: Repository, snack: View): A
     target.gitCommit(nameString, emailString, message.text.toString(), {
       completedTask: SafeAsyncTask ->
       if (completedTask.exception != null) {
-        reportError(context, R.string.error_commit_failed, completedTask.exception!!)
+        reportError(snack, R.string.error_commit_failed, completedTask.exception!!)
         return@gitCommit
       }
       Snackbar.make(
@@ -76,6 +74,7 @@ enum class RemoteOp {
 
 fun pushPullDialog(
     context: AppCompatActivity,
+    snack: View,
     target: Repository,
     operation: RemoteOp
 ): AlertDialog {
@@ -128,17 +127,21 @@ fun pushPullDialog(
   dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
     val usingManualRemote =
         (dialogView.findViewById(R.id.dialog_push_pull_switch_remote) as Switch).isChecked
+    if (!usingManualRemote && remotesList.isEmpty()) return@setOnClickListener
+
     val remote: String = if (usingManualRemote)
       (dialogView.findViewById(R.id.dialog_push_pull_manual_remote) as EditText).text.toString()
     else remotesList[remoteListDropdown.selectedItemId.toInt()]
 
+    if (remote.isBlank()) return@setOnClickListener
+
     val gitActionCallback: (SafeAsyncTask) -> Unit = cb@ { completedTask: SafeAsyncTask ->
       if (completedTask.exception != null) {
-        reportError(context, failSnackRes, completedTask.exception!!)
+        reportError(snack, failSnackRes, completedTask.exception!!)
         return@cb
       }
       Snackbar.make(
-          rootActivityView(context),
+          snack,
           context.resources.getString(successSnackRes, remote),
           Snackbar.LENGTH_LONG
       ).show()
@@ -154,6 +157,7 @@ fun pushPullDialog(
     }
 
     passwordDialog(context, actionCallback)
+    dialog.dismiss()
   }
 
   return dialog

@@ -7,7 +7,6 @@ import android.support.design.widget.FloatingActionButton
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
-import android.text.Editable
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -15,10 +14,8 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Switch
-import android.widget.Toast
 import org.eclipse.jgit.diff.DiffEntry
 import slak.fslistview.FSListView
-import slak.gitforandroid.*
 import java.io.File
 import java.util.*
 
@@ -132,25 +129,25 @@ class RepoViewActivity : AppCompatActivity() {
       startActivityForResult(intent, FILE_OPEN_REQ_CODE)
     }
 
-    repo!!.gitDiff { diffs ->
-      fileDiffs = diffs
-      lv!!.init(this, repo!!.repoFolder, R.layout.list_element, R.color.colorSelected)
-    }
-
     fab = findViewById(R.id.fab) as FloatingActionButton
     fab!!.setOnClickListener {
       commitDialog(this@RepoViewActivity, repo!!, fab!!)
     }
+
+    repo!!.gitDiff(fab!!, { diffs ->
+      fileDiffs = diffs
+      lv!!.init(this, repo!!.repoFolder, R.layout.list_element, R.color.colorSelected)
+    })
 
     supportActionBar!!.setDisplayHomeAsUpEnabled(true)
   }
 
   override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
     if (requestCode == FILE_OPEN_REQ_CODE) {
-      repo!!.gitDiff { diffs ->
+      repo!!.gitDiff(fab!!, { diffs ->
         fileDiffs = diffs
         lv!!.update()
-      }
+      })
       return
     }
     super.onActivityResult(requestCode, resultCode, data)
@@ -184,8 +181,8 @@ class RepoViewActivity : AppCompatActivity() {
     when (item.itemId) {
       android.R.id.home -> onBackPressed() // Behave like the hardware back button
       R.id.menu_repo_view_action_settings -> repoSettingsDialog()
-      R.id.menu_repo_view_action_push -> pushPullDialog(this, repo!!, RemoteOp.PUSH)
-      R.id.menu_repo_view_action_pull -> pushPullDialog(this, repo!!, RemoteOp.PULL)
+      R.id.menu_repo_view_action_push -> pushPullDialog(this, fab!!, repo!!, RemoteOp.PUSH)
+      R.id.menu_repo_view_action_pull -> pushPullDialog(this, fab!!, repo!!, RemoteOp.PULL)
       R.id.menu_repo_view_action_stage -> stageSelected()
       R.id.menu_repo_view_action_unstage -> unstageSelected()
       R.id.menu_repo_view_action_delete -> deleteSelected()

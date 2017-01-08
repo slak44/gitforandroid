@@ -12,9 +12,6 @@ import org.eclipse.jgit.diff.DiffEntry
 import org.eclipse.jgit.lib.PersonIdent
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider
-import slak.gitforandroid.getStringSetting
-import slak.gitforandroid.reportError
-import slak.gitforandroid.rootActivityView
 import java.io.File
 import java.net.URI
 import java.util.*
@@ -76,11 +73,11 @@ class Repository(private val context: AppCompatActivity, name: String) {
     git = Git(internalRepo)
   }
 
-  fun gitInit(callback: (SafeAsyncTask) -> Unit) {
+  fun gitInit(snack: View, callback: (SafeAsyncTask) -> Unit) {
     SafeAsyncTask({
       if (alreadyExists) {
         Snackbar.make(
-            rootActivityView(context),
+            snack,
             R.string.error_repo_name_conflict,
             Snackbar.LENGTH_LONG
         ).show()
@@ -91,11 +88,11 @@ class Repository(private val context: AppCompatActivity, name: String) {
     }, callback).execute()
   }
 
-  fun gitClone(uri: String, callback: (SafeAsyncTask) -> Unit) {
+  fun gitClone(snack: View, uri: String, callback: (SafeAsyncTask) -> Unit) {
     SafeAsyncTask({
       if (alreadyExists) {
         Snackbar.make(
-            rootActivityView(context),
+            snack,
             R.string.error_repo_name_conflict,
             Snackbar.LENGTH_LONG
         ).show()
@@ -211,13 +208,13 @@ class Repository(private val context: AppCompatActivity, name: String) {
     }, callback).execute()
   }
 
-  fun gitDiff(callback: (List<DiffEntry>) -> Unit) {
+  fun gitDiff(snack: View, callback: (List<DiffEntry>) -> Unit) {
     var diffs: List<DiffEntry>? = null
     SafeAsyncTask({
       diffs = git.diff().setCached(false).setShowNameAndStatusOnly(true).call()
     }, { completedTask: SafeAsyncTask ->
       if (completedTask.exception != null) {
-        reportError(context, R.string.error_diff_failed, completedTask.exception!!)
+        reportError(snack, R.string.error_diff_failed, completedTask.exception!!)
         return@SafeAsyncTask
       }
       callback(diffs!!)
