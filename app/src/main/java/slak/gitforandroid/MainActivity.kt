@@ -82,67 +82,11 @@ class MainActivity : AppCompatActivity() {
 
     fab = findViewById(R.id.fab) as FloatingActionButton
     fab!!.setOnClickListener {
-      val newRepo = AlertDialog.Builder(this@MainActivity)
-      val inflater = this@MainActivity.layoutInflater
-      val dialogView = inflater.inflate(R.layout.dialog_add_repo, null)
-
-      val toClone = dialogView.findViewById(R.id.repo_add_dialog_clone) as Switch
-      toClone.setOnCheckedChangeListener { btn: CompoundButton, isChecked: Boolean ->
-        dialogView.findViewById(R.id.repo_add_dialog_cloneURL).visibility =
-            if (isChecked) View.VISIBLE else View.GONE
-      }
-
-      val dialog = newRepo
-          .setTitle(R.string.dialog_add_repo_title)
-          .setView(dialogView)
-          // This listener is set below
-          .setPositiveButton(R.string.dialog_add_repo_confirm, null)
-          // Dismiss automatically
-          .setNegativeButton(R.string.dialog_add_repo_cancel, { dialog, id -> Unit })
-          .create()
-
-      dialog.show()
-
-      // Dialogs get dismissed automatically on click if the builder is used
-      // Add this here instead so they are dismissed only by dialog.dismiss() calls
-      dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
-        createRepo(dialogView, dialog)
-      }
+      createRepoDialog(this, fab!!, { newRepoName ->
+        repoNames.add(newRepoName)
+        listElements!!.notifyDataSetChanged()
+      })
     }
-  }
-
-  private fun createRepo(dialogView: View, dialog: AlertDialog) {
-    val repoNameEditText = dialogView.findViewById(R.id.repo_add_dialog_name) as EditText
-    val cloneURLExists = (dialogView.findViewById(R.id.repo_add_dialog_clone) as Switch).isChecked
-    val newRepoName = repoNameEditText.text.toString()
-    val newRepo = Repository(this@MainActivity, newRepoName)
-    val creationCallback = Repository.callbackFactory(
-        fab!!,
-        if (cloneURLExists) R.string.error_clone_failed else R.string.error_init_failed,
-        if (cloneURLExists) R.string.snack_clone_success else R.string.snack_init_success,
-        {
-          repoNames.add(newRepoName)
-          listElements!!.notifyDataSetChanged()
-        },
-        { t: Throwable ->
-          newRepo.repoFolder.deleteRecursively()
-        }
-    )
-    if (cloneURLExists) {
-      val cloneURLEditText = dialogView.findViewById(R.id.repo_add_dialog_cloneURL) as EditText
-      val cloneURL = cloneURLEditText.text.toString()
-      if (cloneURL.isEmpty()) {
-        cloneURLEditText.error = resources.getString(R.string.error_need_clone_URI)
-        return
-      } else {
-        cloneURLEditText.error = null
-      }
-      // TODO: maybe add a progress bar or something
-      newRepo.gitClone(fab!!, cloneURL, creationCallback)
-    } else {
-      newRepo.gitInit(fab!!, creationCallback)
-    }
-    dialog.dismiss()
   }
 
   override fun onCreateOptionsMenu(menu: Menu): Boolean {

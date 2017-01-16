@@ -68,6 +68,68 @@ fun passwordDialog(context: AppCompatActivity, passCb: (String) -> Unit): AlertD
   return dialog
 }
 
+fun createRepoDialog(
+    context: AppCompatActivity,
+    snack: View,
+    onSuccess: (createdName: String) -> Unit = {}
+): AlertDialog {
+  val newRepo = AlertDialog.Builder(context)
+  val dialogView = context.layoutInflater.inflate(R.layout.dialog_add_repo, null)
+
+  val toClone = dialogView.findViewById(R.id.repo_add_dialog_clone) as Switch
+  toClone.setOnCheckedChangeListener { btn: CompoundButton, isChecked: Boolean ->
+    dialogView.findViewById(R.id.repo_add_dialog_cloneURL).visibility =
+        if (isChecked) View.VISIBLE else View.GONE
+  }
+
+  val dialog = newRepo
+      .setTitle(R.string.dialog_add_repo_title)
+      .setView(dialogView)
+      // This listener is set below
+      .setPositiveButton(R.string.dialog_add_repo_confirm, null)
+      // Dismiss automatically
+      .setNegativeButton(R.string.dialog_add_repo_cancel, { dialog, id -> Unit })
+      .create()
+
+  dialog.show()
+
+  // Dialogs get dismissed automatically on click if the builder is used
+  // Add this here instead so they are dismissed only by dialog.dismiss() calls
+  dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
+    val repoNameEditText = dialogView.findViewById(R.id.repo_add_dialog_name) as EditText
+    val cloneURLExists = (dialogView.findViewById(R.id.repo_add_dialog_clone) as Switch).isChecked
+    val newRepoName = repoNameEditText.text.toString()
+    val newRepository = Repository(context, newRepoName)
+    val creationCallback = Repository.callbackFactory(
+        snack,
+        if (cloneURLExists) R.string.error_clone_failed else R.string.error_init_failed,
+        if (cloneURLExists) R.string.snack_clone_success else R.string.snack_init_success,
+        {
+          onSuccess(newRepoName)
+        },
+        { t: Throwable ->
+          newRepository.repoFolder.deleteRecursively()
+        }
+    )
+    if (cloneURLExists) {
+      val cloneURLEditText = dialogView.findViewById(R.id.repo_add_dialog_cloneURL) as EditText
+      val cloneURL = cloneURLEditText.text.toString()
+      if (cloneURL.isEmpty()) {
+        cloneURLEditText.error = context.getString(R.string.error_need_clone_URI)
+        return@setOnClickListener
+      } else {
+        cloneURLEditText.error = null
+      }
+      // TODO: maybe add a progress bar or something
+      newRepository.gitClone(snack, cloneURL, creationCallback)
+    } else {
+      newRepository.gitInit(snack, creationCallback)
+    }
+    dialog.dismiss()
+  }
+  return dialog
+}
+
 enum class RemoteOp {
   PUSH, PULL
 }
