@@ -5,6 +5,7 @@ import android.os.Environment
 import android.support.annotation.StringRes
 import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
+import android.util.Log
 import android.view.View
 import org.eclipse.jgit.api.CloneCommand
 import org.eclipse.jgit.api.Git
@@ -33,21 +34,24 @@ class Repository(private val context: AppCompatActivity, name: String) {
      * @param view to attach snackbar to
      * @param fail snackbar text for error
      * @param success snackbar text for success
-     * @param next optional function to run only after success
+     * @param onSuccess optional function to run only after success
+     * @param onError optional function to run only on failiure
      */
     fun callbackFactory(
         view: View,
         @StringRes fail: Int,
         @StringRes success: Int,
-        next: () -> Unit = {}
+        onSuccess: () -> Unit = {},
+        onError: (t: Throwable) -> Unit = {}
     ): (SafeAsyncTask) -> Unit {
       return cb@ { completedTask: SafeAsyncTask ->
         if (completedTask.exception != null) {
           reportError(view, fail, completedTask.exception!!)
+          onError(completedTask.exception!!)
           return@cb
         }
         Snackbar.make(view, success, Snackbar.LENGTH_LONG).show()
-        next()
+        onSuccess()
       }
     }
 

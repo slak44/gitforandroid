@@ -15,15 +15,10 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.*
-import slak.gitforandroid.R
-import slak.gitforandroid.Repository
 import java.util.*
 
-fun reportError(snack: View, @StringRes strRes: Int, e: Exception, type: String = "Error") {
-  when (type) {
-    "WTF" -> Log.wtf("GitForAndroid", snack.resources.getString(strRes), e)
-    else -> Log.e("GitForAndroid", snack.resources.getString(strRes), e)
-  }
+fun reportError(snack: View, @StringRes strRes: Int, e: Throwable) {
+  Log.e("GitForAndroid", snack.resources.getString(strRes), e)
   // TODO: make 'more' button on snack, to lead to err text
   Snackbar.make(snack, strRes, Snackbar.LENGTH_LONG).show()
 }
@@ -122,12 +117,15 @@ class MainActivity : AppCompatActivity() {
     val newRepoName = repoNameEditText.text.toString()
     val newRepo = Repository(this@MainActivity, newRepoName)
     val creationCallback = Repository.callbackFactory(
-        dialogView,
+        fab!!,
         if (cloneURLExists) R.string.error_clone_failed else R.string.error_init_failed,
         if (cloneURLExists) R.string.snack_clone_success else R.string.snack_init_success,
         {
           repoNames.add(newRepoName)
           listElements!!.notifyDataSetChanged()
+        },
+        { t: Throwable ->
+          newRepo.repoFolder.deleteRecursively()
         }
     )
     if (cloneURLExists) {
