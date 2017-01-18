@@ -32,6 +32,12 @@
         app:showAsAction="never"/>
 
     <item
+        android:id="@+id/menu_repo_view_action_open_manager"
+        android:orderInCategory="115"
+        android:title="@string/menu_repo_view_open_manager"
+        app:showAsAction="never"/>
+
+    <item
         android:id="@+id/menu_repo_view_action_settings"
         android:orderInCategory="999"
         android:title="@string/menu_main_settings"

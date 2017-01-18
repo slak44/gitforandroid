@@ -35,6 +35,8 @@
     <string name="menu_repo_view_pull">Pull</string>
     <string name="menu_repo_view_quick_commit">Quick commit</string>
     <string name="menu_repo_view_add_all">Add all files</string>
+    <string name="menu_repo_view_open_manager">Open in file manager</string>
+    <string name="intent_open_manager_chooser">Choose file manager</string>
 
     <!-- Snack action text -->
     <string name="snack_action_revert_commit">Revert</string>

@@ -177,9 +177,24 @@ class RepoViewActivity : AppCompatActivity() {
     ))
   }
 
+  private fun openFileManager(target: File) {
+    val intent = Intent(Intent.ACTION_VIEW)
+    intent.setDataAndType(Uri.parse(target.absolutePath), "*/*")
+    intent.putExtra(Intent.EXTRA_MIME_TYPES, arrayOf(
+        "vnd.android.cursor.item/file",
+        "vnd.android.cursor.item/directory",
+        "vnd.android.cursor.dir/*",
+        "resource/folder",
+        "inode/directory",
+        "x-directory/normal"
+    ))
+    startActivity(Intent.createChooser(intent, getString(R.string.intent_open_manager_chooser)))
+  }
+
   override fun onOptionsItemSelected(item: MenuItem): Boolean {
     when (item.itemId) {
       android.R.id.home -> onBackPressed() // Behave like the hardware back button
+      R.id.menu_repo_view_action_open_manager -> openFileManager(lv!!.currentDirectory)
       R.id.menu_repo_view_action_settings -> repoSettingsDialog()
       R.id.menu_repo_view_action_push -> pushPullDialog(this, fab!!, repo!!, RemoteOp.PUSH)
       R.id.menu_repo_view_action_pull -> pushPullDialog(this, fab!!, repo!!, RemoteOp.PULL)
