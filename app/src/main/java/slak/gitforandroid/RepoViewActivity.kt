@@ -156,24 +156,24 @@ class RepoViewActivity : AppCompatActivity() {
   private fun stageSelected() {
     repo!!.gitAdd(lv!!.selectedPaths, Repository.callbackFactory(
         fab!!,
-        R.string.error_add_failed,
-        R.string.snack_item_stage_success
+        resources.getString(R.string.error_add_failed),
+        resources.getString(R.string.snack_item_stage_success)
     ))
   }
 
   private fun unstageSelected() {
     repo!!.gitRm(lv!!.selectedPaths, Repository.callbackFactory(
         fab!!,
-        R.string.error_rm_failed,
-        R.string.snack_item_unstage_success
+        resources.getString(R.string.error_rm_failed),
+        resources.getString(R.string.snack_item_unstage_success)
     ))
   }
 
   private fun deleteSelected() {
     repo!!.gitDelete(lv!!.selectedPaths, Repository.callbackFactory(
         fab!!,
-        R.string.error_delete_failed,
-        R.string.snack_item_delete_success
+        resources.getString(R.string.error_delete_failed),
+        resources.getString(R.string.snack_item_delete_success)
     ))
   }
 
@@ -187,28 +187,31 @@ class RepoViewActivity : AppCompatActivity() {
       R.id.menu_repo_view_action_unstage -> unstageSelected()
       R.id.menu_repo_view_action_delete -> deleteSelected()
       R.id.menu_repo_view_action_add_all -> repo!!.gitAddAll(Repository.callbackFactory(
-          fab!!, R.string.error_add_failed, R.string.snack_item_stage_all_success))
+          fab!!,
+          resources.getString(R.string.error_add_failed),
+          resources.getString(R.string.snack_item_stage_all_success)
+      ))
       R.id.menu_repo_view_action_quick_commit -> {
         // 1. Ask for password
         // 2. Stage everything
         // 3. Commit
         // 4. Push to origin
         passwordDialog(this, { pass: String ->
-          val gitPushCb = Repository.Companion.callbackFactory(
+          val gitPushCb = Repository.callbackFactory(
               fab!!,
-              R.string.error_push_failed,
-              R.string.snack_item_push_success
+              resources.getString(R.string.error_push_failed),
+              resources.getString(R.string.snack_item_push_success)
           )
-          val gitQCommitCb = Repository.Companion.callbackFactory(
+          val gitQCommitCb = Repository.callbackFactory(
               fab!!,
-              R.string.error_commit_failed,
-              R.string.snack_item_commit_success,
+              resources.getString(R.string.error_commit_failed),
+              resources.getString(R.string.snack_item_commit_success),
               { repo!!.gitPush("origin", pass, gitPushCb) }
           )
-          val gitAddCb = Repository.Companion.callbackFactory(
+          val gitAddCb = Repository.callbackFactory(
               fab!!,
-              R.string.error_add_failed,
-              R.string.snack_item_stage_all_success,
+              resources.getString(R.string.error_add_failed),
+              resources.getString(R.string.snack_item_stage_all_success),
               { repo!!.gitQuickCommit(gitQCommitCb) }
           )
           repo!!.gitAddAll(gitAddCb)

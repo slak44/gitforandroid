@@ -45,9 +45,9 @@
     <string name="snack_item_stage_success">Items staged</string>
     <string name="snack_item_unstage_success">Items unstaged</string>
     <string name="snack_item_stage_all_success">All repository items staged</string>
-    <string name="snack_item_commit_success">Created commit \'%s\'</string>
-    <string name="snack_item_push_success">Pushed to remote \'%s\'</string>
-    <string name="snack_item_pull_success">Pulled from remote \'%s\'</string>
+    <string name="snack_item_commit_success">Created commit: %s</string>
+    <string name="snack_item_push_success">Pushed to remote: %s</string>
+    <string name="snack_item_pull_success">Pulled from remote: %s</string>
     <string name="snack_item_delete_success">Items deleted</string>
 
     <!-- Push/Pull dialog-->

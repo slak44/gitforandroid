@@ -35,7 +35,11 @@ fun commitDialog(context: AppCompatActivity, target: Repository, snack: View): A
     target.gitCommit(nameString, emailString, message.text.toString(), {
       completedTask: SafeAsyncTask ->
       if (completedTask.exception != null) {
-        reportError(snack, R.string.error_commit_failed, completedTask.exception!!)
+        reportError(
+            snack,
+            context.resources.getString(R.string.error_commit_failed),
+            completedTask.exception!!
+        )
         return@gitCommit
       }
       Snackbar.make(
@@ -98,12 +102,14 @@ fun createRepoDialog(
   dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
     val repoNameEditText = dialogView.findViewById(R.id.repo_add_dialog_name) as EditText
     val cloneURLExists = (dialogView.findViewById(R.id.repo_add_dialog_clone) as Switch).isChecked
+    val failedRes = if (cloneURLExists) R.string.error_clone_failed else R.string.error_init_failed
+    val okRes = if (cloneURLExists) R.string.snack_clone_success else R.string.snack_init_success
     val newRepoName = repoNameEditText.text.toString()
     val newRepository = Repository(context, newRepoName)
     val creationCallback = Repository.callbackFactory(
         snack,
-        if (cloneURLExists) R.string.error_clone_failed else R.string.error_init_failed,
-        if (cloneURLExists) R.string.snack_clone_success else R.string.snack_init_success,
+        context.resources.getString(failedRes),
+        context.resources.getString(okRes),
         {
           onSuccess(newRepoName)
         },
@@ -199,7 +205,11 @@ fun pushPullDialog(
 
     val gitActionCallback: (SafeAsyncTask) -> Unit = cb@ { completedTask: SafeAsyncTask ->
       if (completedTask.exception != null) {
-        reportError(snack, failSnackRes, completedTask.exception!!)
+        reportError(
+            snack,
+            context.resources.getString(failSnackRes, remote),
+            completedTask.exception!!
+        )
         return@cb
       }
       Snackbar.make(

@@ -39,8 +39,8 @@ class Repository(private val context: AppCompatActivity, name: String) {
      */
     fun callbackFactory(
         view: View,
-        @StringRes fail: Int,
-        @StringRes success: Int,
+        fail: String,
+        success: String,
         onSuccess: () -> Unit = {},
         onError: (t: Throwable) -> Unit = {}
     ): (SafeAsyncTask) -> Unit {
@@ -218,7 +218,11 @@ class Repository(private val context: AppCompatActivity, name: String) {
       diffs = git.diff().setCached(false).setShowNameAndStatusOnly(true).call()
     }, { completedTask: SafeAsyncTask ->
       if (completedTask.exception != null) {
-        reportError(snack, R.string.error_diff_failed, completedTask.exception!!)
+        reportError(
+            snack,
+            snack.resources.getString(R.string.error_diff_failed),
+            completedTask.exception!!
+        )
         return@SafeAsyncTask
       }
       callback(diffs!!)

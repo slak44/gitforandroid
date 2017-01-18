@@ -1,31 +1,18 @@
 package slak.gitforandroid
 
 import android.app.AlertDialog
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.preference.PreferenceManager
-import android.support.annotation.StringRes
 import android.support.design.widget.FloatingActionButton
-import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
-import android.view.View
-import android.widget.*
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
+import android.widget.ListView
+import android.widget.TextView
 import java.util.*
-
-fun reportError(snack: View, @StringRes strRes: Int, e: Throwable) {
-  Log.e("GitForAndroid", snack.resources.getString(strRes), e)
-  // TODO: make 'more' button on snack, to lead to err text
-  Snackbar.make(snack, strRes, Snackbar.LENGTH_LONG).show()
-}
-
-fun getStringSetting(context: Context, key: String): String {
-  return PreferenceManager.getDefaultSharedPreferences(context).getString(key, "")
-}
 
 class MainActivity : AppCompatActivity() {
   companion object {
