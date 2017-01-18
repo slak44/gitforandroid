@@ -26,7 +26,7 @@ class MainActivity : AppCompatActivity() {
 
   private fun addRepoNames() {
     repoNames.clear()
-    repoNames.addAll(Arrays.asList(*Repository.getRepoDirectory(this).list()))
+    repoNames.addAll(Arrays.asList(*Repository.getRootDirectory(this).list()))
     repoNames.sort()
   }
 

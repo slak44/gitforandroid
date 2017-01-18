@@ -2,10 +2,8 @@ package slak.gitforandroid
 
 import android.content.Context
 import android.os.Environment
-import android.support.annotation.StringRes
 import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
-import android.util.Log
 import android.view.View
 import org.eclipse.jgit.api.CloneCommand
 import org.eclipse.jgit.api.Git
@@ -23,19 +21,24 @@ import java.util.*
  */
 class Repository(private val context: AppCompatActivity, name: String) {
   companion object {
-    fun getRepoDirectory(currentActivity: Context): File {
+    /**
+     * Fetch the parent directory for repositories.
+     * @return a File object
+     */
+    fun getRootDirectory(currentActivity: Context): File {
       val f = File(currentActivity.getExternalFilesDir(null), "repositories")
       f.mkdirs()
       return f
     }
 
     /**
-     * Returns a callback that alerts the user of the task result.
+     * Makes callbacks for repository actions.
      * @param view to attach snackbar to
      * @param fail snackbar text for error
      * @param success snackbar text for success
      * @param onSuccess optional function to run only after success
      * @param onError optional function to run only on failiure
+     * @return a callback is passed the task.
      */
     fun callbackFactory(
         view: View,
@@ -43,18 +46,20 @@ class Repository(private val context: AppCompatActivity, name: String) {
         success: String,
         onSuccess: () -> Unit = {},
         onError: (t: Throwable) -> Unit = {}
-    ): (SafeAsyncTask) -> Unit {
-      return cb@ { completedTask: SafeAsyncTask ->
-        if (completedTask.exception != null) {
-          reportError(view, fail, completedTask.exception!!)
-          onError(completedTask.exception!!)
-          return@cb
-        }
-        Snackbar.make(view, success, Snackbar.LENGTH_LONG).show()
-        onSuccess()
+    ): (SafeAsyncTask) -> Unit = cb@ { completedTask: SafeAsyncTask ->
+      if (completedTask.exception != null) {
+        reportError(view, fail, completedTask.exception!!)
+        onError(completedTask.exception!!)
+        return@cb
       }
+      Snackbar.make(view, success, Snackbar.LENGTH_LONG).show()
+      onSuccess()
     }
 
+    /**
+     * Check availability of the external storage.
+     * @return if it's available
+     */
     val isFilesystemAvailable: Boolean
       get() = Environment.MEDIA_MOUNTED == Environment.getExternalStorageState()
   }

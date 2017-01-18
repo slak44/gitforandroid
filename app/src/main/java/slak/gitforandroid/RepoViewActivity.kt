@@ -53,7 +53,7 @@ class RepoViewActivity : AppCompatActivity() {
             renameEditText.error = getString(R.string.error_field_blank)
             return@setOnClickListener
           }
-          val target = File(Repository.getRepoDirectory(this), renameEditText.text.toString())
+          val target = File(Repository.getRootDirectory(this), renameEditText.text.toString())
           if (target.exists()) {
             renameEditText.error = getString(R.string.error_repo_name_conflict)
             return@setOnClickListener
