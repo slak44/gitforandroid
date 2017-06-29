@@ -10,6 +10,7 @@ import org.eclipse.jgit.api.Git
 import org.eclipse.jgit.diff.DiffEntry
 import org.eclipse.jgit.lib.PersonIdent
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder
+import org.eclipse.jgit.transport.CredentialsProvider
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider
 import java.io.File
 import java.net.URI
@@ -191,29 +192,21 @@ class Repository(private val context: AppCompatActivity, name: String) {
 
   fun gitPush(
       remote: String,
-      password: String,
+      cp: CredentialsProvider?,
       callback: (SafeAsyncTask) -> Unit
   ) {
     SafeAsyncTask({
-      val upcp = UsernamePasswordCredentialsProvider(
-          getStringSetting(context, "git_username"),
-          password
-      )
-      git.push().setRemote(remote).setCredentialsProvider(upcp).setPushAll().call()
+      git.push().setRemote(remote).setCredentialsProvider(cp).setPushAll().call()
     }, callback).execute()
   }
 
   fun gitPull(
       remote: String,
-      password: String,
+      cp: CredentialsProvider?,
       callback: (SafeAsyncTask) -> Unit
   ) {
     SafeAsyncTask({
-      val upcp = UsernamePasswordCredentialsProvider(
-          getStringSetting(context, "git_username"),
-          password
-      )
-      git.pull().setRemote(remote).setCredentialsProvider(upcp).call()
+      git.pull().setRemote(remote).setCredentialsProvider(cp).call()
     }, callback).execute()
   }
 
