@@ -13,6 +13,7 @@ import android.widget.ListView
 
 import java.io.File
 import java.util.ArrayList
+import java.util.Comparator
 import java.util.Stack
 
 class FSListView : ListView {
@@ -163,17 +164,17 @@ class FSListView : ListView {
     nodes.clear()
     nodes.addAll(SelectableAdapterModel.fromArray(folderStack.peek().thing.listFiles()))
 
-    nodes.sort { lhs, rhs ->
+    nodes.sortWith(Comparator({ lhs, rhs ->
       // Directories before files
       if (lhs.thing.isDirectory xor rhs.thing.isDirectory) {
         if (lhs.thing.isDirectory)
-          return@sort -1
+          return@Comparator -1
         else
-          return@sort 1
+          return@Comparator 1
       }
       // Lexicographic comparison of node names
       lhs.thing.name.toLowerCase().compareTo(rhs.thing.name.toLowerCase())
-    }
+    }))
 
     listElements!!.notifyDataSetChanged()
   }
