@@ -5,6 +5,7 @@ import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
 import android.view.View
 import android.widget.*
+import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider
 
 fun commitDialog(context: AppCompatActivity, target: Repository, snack: View): AlertDialog {
   val dialogView: View = context.layoutInflater.inflate(R.layout.dialog_commit, null)
@@ -19,8 +20,8 @@ fun commitDialog(context: AppCompatActivity, target: Repository, snack: View): A
   val substitute = dialogView.findViewById(R.id.dialog_commit_substitute) as Switch
   substitute.setOnCheckedChangeListener { btn: CompoundButton, isChecked: Boolean ->
     val dataStatus = if (isChecked) View.VISIBLE else View.GONE
-    dialogView.findViewById(R.id.dialog_commit_name).visibility = dataStatus
-    dialogView.findViewById(R.id.dialog_commit_email).visibility = dataStatus
+    dialogView.findViewById<TextView>(R.id.dialog_commit_name).visibility = dataStatus
+    dialogView.findViewById<TextView>(R.id.dialog_commit_email).visibility = dataStatus
   }
 
   dialog.show()
@@ -82,7 +83,7 @@ fun createRepoDialog(
 
   val toClone = dialogView.findViewById(R.id.repo_add_dialog_clone) as Switch
   toClone.setOnCheckedChangeListener { btn: CompoundButton, isChecked: Boolean ->
-    dialogView.findViewById(R.id.repo_add_dialog_cloneURL).visibility =
+    dialogView.findViewById<TextView>(R.id.repo_add_dialog_cloneURL).visibility =
         if (isChecked) View.VISIBLE else View.GONE
   }
 
@@ -175,8 +176,8 @@ fun pushPullDialog(
   val manualRemote = dialogView.findViewById(R.id.dialog_push_pull_switch_remote) as Switch
   manualRemote.setOnCheckedChangeListener { btn: CompoundButton, isChecked: Boolean ->
     val dataStatus = if (isChecked) View.GONE else View.VISIBLE
-    dialogView.findViewById(R.id.dialog_push_pull_spinner_layout).visibility = dataStatus
-    dialogView.findViewById(R.id.dialog_push_pull_manual_remote).visibility =
+    dialogView.findViewById<LinearLayout>(R.id.dialog_push_pull_spinner_layout).visibility = dataStatus
+    dialogView.findViewById<EditText>(R.id.dialog_push_pull_manual_remote).visibility =
         if (isChecked) View.VISIBLE else View.GONE // just opposite of dataStatus
   }
 
@@ -187,7 +188,7 @@ fun pushPullDialog(
     remoteListDropdown.adapter =
         ArrayAdapter(context, android.R.layout.simple_spinner_item, remotesList)
   } else {
-    dialogView.findViewById(R.id.dialog_push_pull_dropdown_empty).visibility = View.VISIBLE
+    dialogView.findViewById<TextView>(R.id.dialog_push_pull_dropdown_empty).visibility = View.VISIBLE
     remoteListDropdown.visibility = View.GONE
   }
 
@@ -221,10 +222,10 @@ fun pushPullDialog(
 
     val actionCallback: (String) -> Unit = when (operation) {
       RemoteOp.PUSH -> { pass: String ->
-        target.gitPush(remote, pass, gitActionCallback)
+        target.gitPush(remote, UsernamePasswordCredentialsProvider("", pass), gitActionCallback)
       }
       RemoteOp.PULL -> { pass: String ->
-        target.gitPull(remote, pass, gitActionCallback)
+        target.gitPull(remote, UsernamePasswordCredentialsProvider("", pass), gitActionCallback)
       }
     }
 

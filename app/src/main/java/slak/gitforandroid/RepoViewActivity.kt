@@ -14,7 +14,9 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Switch
+import android.widget.TextView
 import org.eclipse.jgit.diff.DiffEntry
+import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider
 import slak.fslistview.FSListView
 import java.io.File
 import java.util.*
@@ -113,7 +115,7 @@ class RepoViewActivity : AppCompatActivity() {
       return@cb view
     }
 
-    val emptyFolderText = findViewById(R.id.repo_view_empty_folder)!!
+    val emptyFolderText = findViewById<TextView>(R.id.repo_view_empty_folder)!!
     lv!!.onFolderChange = { old, new ->
       if (new.list().isEmpty()) {
         emptyFolderText.visibility = View.VISIBLE
@@ -221,7 +223,7 @@ class RepoViewActivity : AppCompatActivity() {
               fab!!,
               resources.getString(R.string.error_commit_failed),
               resources.getString(R.string.snack_item_commit_success),
-              { repo!!.gitPush("origin", pass, gitPushCb) }
+              { repo!!.gitPush("origin", UsernamePasswordCredentialsProvider("", pass), gitPushCb) }
           )
           val gitAddCb = Repository.callbackFactory(
               fab!!,
