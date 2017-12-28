@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.support.design.widget.FloatingActionButton
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.AdapterView
@@ -41,6 +42,10 @@ class MainActivity : AppCompatActivity() {
     setContentView(R.layout.activity_main)
     val toolbar = findViewById(R.id.toolbar) as Toolbar
     setSupportActionBar(toolbar)
+
+    Thread.setDefaultUncaughtExceptionHandler {
+      thread, throwable -> Log.e("UNCAUGHT DEFAULT", thread.toString(), throwable)
+    }
 
     // Force the user to quit if there isn't access to the filesystem
     if (!Repository.isFilesystemAvailable) {

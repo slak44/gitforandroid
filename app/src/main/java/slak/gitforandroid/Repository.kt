@@ -2,16 +2,15 @@ package slak.gitforandroid
 
 import android.content.Context
 import android.os.Environment
-import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
-import android.view.View
+import kotlinx.coroutines.experimental.CommonPool
+import kotlinx.coroutines.experimental.Job
+import kotlinx.coroutines.experimental.launch
 import org.eclipse.jgit.api.CloneCommand
 import org.eclipse.jgit.api.Git
-import org.eclipse.jgit.diff.DiffEntry
 import org.eclipse.jgit.lib.PersonIdent
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder
 import org.eclipse.jgit.transport.CredentialsProvider
-import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider
 import java.io.File
 import java.net.URI
 import java.util.*
@@ -33,31 +32,6 @@ class Repository(private val context: AppCompatActivity, name: String) {
     }
 
     /**
-     * Makes callbacks for repository actions.
-     * @param view to attach snackbar to
-     * @param fail snackbar text for error
-     * @param success snackbar text for success
-     * @param onSuccess optional function to run only after success
-     * @param onError optional function to run only on failiure
-     * @return a callback is passed the task.
-     */
-    fun callbackFactory(
-        view: View,
-        fail: String,
-        success: String,
-        onSuccess: () -> Unit = {},
-        onError: (t: Throwable) -> Unit = {}
-    ): (SafeAsyncTask) -> Unit = cb@ { completedTask: SafeAsyncTask ->
-      if (completedTask.exception != null) {
-        reportError(view, fail, completedTask.exception!!)
-        onError(completedTask.exception!!)
-        return@cb
-      }
-      Snackbar.make(view, success, Snackbar.LENGTH_LONG).show()
-      onSuccess()
-    }
-
-    /**
      * Check availability of the external storage.
      * @return if it's available
      */
@@ -65,7 +39,8 @@ class Repository(private val context: AppCompatActivity, name: String) {
       get() = Environment.MEDIA_MOUNTED == Environment.getExternalStorageState()
   }
 
-  private var alreadyExists: Boolean = false
+  var alreadyExists: Boolean = false
+    private set
   val repoFolder: File
   private var git: Git
 
@@ -83,155 +58,85 @@ class Repository(private val context: AppCompatActivity, name: String) {
     git = Git(internalRepo)
   }
 
-  fun gitInit(snack: View, callback: (SafeAsyncTask) -> Unit) {
-    SafeAsyncTask({
-      if (alreadyExists) {
-        Snackbar.make(
-            snack,
-            R.string.error_repo_name_conflict,
-            Snackbar.LENGTH_LONG
-        ).show()
-        return@SafeAsyncTask
-      }
-      git.repository.create()
-      alreadyExists = true
-    }, callback).execute()
+  fun init() = launch(CommonPool) {
+    if (alreadyExists) throw IllegalStateException("Repo already exists")
+    git.repository.create()
+    alreadyExists = true
   }
 
-  fun gitClone(snack: View, uri: String, callback: (SafeAsyncTask) -> Unit) {
-    SafeAsyncTask({
-      if (alreadyExists) {
-        Snackbar.make(
-            snack,
-            R.string.error_repo_name_conflict,
-            Snackbar.LENGTH_LONG
-        ).show()
-        return@SafeAsyncTask
-      }
-      val clCom = CloneCommand()
-      clCom.setCloneAllBranches(true)
-      clCom.setDirectory(repoFolder)
-      clCom.setURI(uri)
-      clCom.call()
-      alreadyExists = true
-    }, callback).execute()
+  fun clone(uri: String) = launch(CommonPool) {
+    if (alreadyExists) throw IllegalStateException("Repo already exists")
+    val clCom = CloneCommand()
+    clCom.setCloneAllBranches(true)
+    clCom.setDirectory(repoFolder)
+    clCom.setURI(uri)
+    clCom.call()
+    alreadyExists = true
   }
 
-  fun gitAdd(filePatterns: ArrayList<String>, callback: (SafeAsyncTask) -> Unit) {
-    SafeAsyncTask({
-      val aCom = git.add()
-      for (pattern in filePatterns) aCom.addFilepattern(pattern)
-      aCom.call()
-    }, callback).execute()
+  fun add(filePatterns: ArrayList<String>) = launch(CommonPool) {
+    val aCom = git.add()
+    for (pattern in filePatterns) aCom.addFilepattern(pattern)
+    aCom.call()
   }
 
-  fun gitAddAll(callback: (SafeAsyncTask) -> Unit) {
-    SafeAsyncTask({
-      val aCom = git.add()
-      aCom.addFilepattern(".")
-      aCom.call()
-    }, callback).execute()
+  fun addAll() = launch(CommonPool) {
+    val aCom = git.add()
+    aCom.addFilepattern(".")
+    aCom.call()
   }
 
-  fun gitRm(filePatterns: ArrayList<String>, callback: (SafeAsyncTask) -> Unit) {
-    SafeAsyncTask({
-      val rmCom = git.rm().setCached(true)
-      for (pattern in filePatterns) rmCom.addFilepattern(pattern)
-      rmCom.call()
-    }, callback).execute()
+  fun removeFromIndex(filePatterns: ArrayList<String>) = launch(CommonPool) {
+    val rmCom = git.rm().setCached(true)
+    for (pattern in filePatterns) rmCom.addFilepattern(pattern)
+    rmCom.call()
   }
 
-  fun gitDelete(filePatterns: ArrayList<String>, callback: (SafeAsyncTask) -> Unit) {
-    SafeAsyncTask({
-      val rmCom = git.rm()
-      for (pattern in filePatterns) rmCom.addFilepattern(pattern)
-      rmCom.call()
-    }, callback).execute()
+  fun delete(filePatterns: ArrayList<String>) = launch(CommonPool) {
+    val rmCom = git.rm()
+    for (pattern in filePatterns) rmCom.addFilepattern(pattern)
+    rmCom.call()
   }
 
-  fun gitCommit(
-      author: PersonIdent?,
-      committer: PersonIdent?,
-      message: String,
-      callback: (SafeAsyncTask) -> Unit
-  ) {
+  fun commit(author: PersonIdent?,
+             committer: PersonIdent?,
+             message: String) = launch(CommonPool) {
     val stored = PersonIdent(
-        getStringSetting(context, "git_name"), getStringSetting(context, "git_email"))
-    SafeAsyncTask({
-      git.commit()
-          .setAuthor(author ?: stored)
-          .setCommitter(committer ?: stored)
-          .setMessage(message)
-          .call()
-    }, callback).execute()
+        getStringSetting(this@Repository.context, "git_name"),
+        getStringSetting(this@Repository.context, "git_email"))
+    git.commit()
+        .setAuthor(author ?: stored)
+        .setCommitter(committer ?: stored)
+        .setMessage(message)
+        .call()
   }
 
-  fun gitCommit(
-      committer: PersonIdent?,
-      message: String,
-      callback: (SafeAsyncTask) -> Unit
-  ) {
-    gitCommit(committer, committer, message, callback)
-  }
+  fun commit(committer: PersonIdent?, message: String) = commit(committer, committer, message)
 
-  fun gitCommit(
-      name: String?,
-      email: String?,
-      message: String,
-      callback: (SafeAsyncTask) -> Unit
-  ) {
+  fun commit(name: String?, email: String?, message: String): Job {
     val pi: PersonIdent? =
         if (name != null && email != null) PersonIdent(name, email)
         else null
-    gitCommit(pi, pi, message, callback)
+    return commit(pi, pi, message)
   }
 
-  fun gitQuickCommit(callback: (SafeAsyncTask) -> Unit) {
-    gitCommit(null, "", callback)
+  fun quickCommit() = commit(null, "")
+
+  fun push(remote: String, cp: CredentialsProvider?) = launch(CommonPool) {
+    git.push().setRemote(remote).setCredentialsProvider(cp).setPushAll().call()
   }
 
-  fun gitPush(
-      remote: String,
-      cp: CredentialsProvider?,
-      callback: (SafeAsyncTask) -> Unit
-  ) {
-    SafeAsyncTask({
-      git.push().setRemote(remote).setCredentialsProvider(cp).setPushAll().call()
-    }, callback).execute()
+  fun pull(remote: String, cp: CredentialsProvider?) = launch(CommonPool) {
+    git.pull().setRemote(remote).setCredentialsProvider(cp).call()
   }
 
-  fun gitPull(
-      remote: String,
-      cp: CredentialsProvider?,
-      callback: (SafeAsyncTask) -> Unit
-  ) {
-    SafeAsyncTask({
-      git.pull().setRemote(remote).setCredentialsProvider(cp).call()
-    }, callback).execute()
-  }
-
-  fun gitDiff(snack: View, callback: (List<DiffEntry>) -> Unit) {
-    var diffs: List<DiffEntry>? = null
-    SafeAsyncTask({
-      diffs = git.diff().setCached(false).setShowNameAndStatusOnly(true).call()
-    }, { completedTask: SafeAsyncTask ->
-      if (completedTask.exception != null) {
-        reportError(
-            snack,
-            snack.resources.getString(R.string.error_diff_failed),
-            completedTask.exception!!
-        )
-        return@SafeAsyncTask
-      }
-      callback(diffs!!)
-    }).execute()
+  fun diff() = async2(CommonPool) {
+    git.diff().setCached(false).setShowNameAndStatusOnly(true).call()
   }
 
   fun listRemotes(): Array<out String> {
     return File(repoFolder, ".git/refs/remotes").list() ?: arrayOf()
   }
 
-  fun relativize(path: URI): URI {
-    return repoFolder.toURI().relativize(path)
-  }
+  fun relativize(path: URI): URI = repoFolder.toURI().relativize(path)
 }

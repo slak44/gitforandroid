@@ -4,6 +4,7 @@ buildscript {
     ext.kotlin_version = '1.2.0'
     ext.android_appcompat_version = "26.1.0"
     ext.kotlin_coroutines_version = "0.16"
+    ext.anko_version = "0.10.1"
     repositories {
         jcenter()
         google()

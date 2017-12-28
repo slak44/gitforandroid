@@ -1,10 +1,15 @@
 package slak.gitforandroid
 
 import android.app.AlertDialog
+import android.content.Context
 import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
+import android.view.LayoutInflater
 import android.view.View
 import android.widget.*
+import kotlinx.coroutines.experimental.Job
+import kotlinx.coroutines.experimental.android.UI
+import kotlinx.coroutines.experimental.launch
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider
 
 fun commitDialog(context: AppCompatActivity, target: Repository, snack: View): AlertDialog {
@@ -33,41 +38,36 @@ fun commitDialog(context: AppCompatActivity, target: Repository, snack: View): A
     var emailString: String? = null
     if (!name.text.toString().isEmpty()) nameString = name.text.toString()
     if (!email.text.toString().isEmpty()) emailString = email.text.toString()
-    target.gitCommit(nameString, emailString, message.text.toString(), {
-      completedTask: SafeAsyncTask ->
-      if (completedTask.exception != null) {
-        reportError(
-            snack,
-            context.resources.getString(R.string.error_commit_failed),
-            completedTask.exception!!
-        )
-        return@gitCommit
+    target.commit(nameString, emailString, message.text.toString()).invokeOnCompletion {
+      if (it != null) {
+        Snackbar.make(snack, R.string.error_commit_failed, Snackbar.LENGTH_LONG)
+        it.printStackTrace()
+        return@invokeOnCompletion
       }
       Snackbar.make(
           snack,
           context.resources.getString(R.string.snack_item_commit_success, message.text.toString()),
           Snackbar.LENGTH_LONG
-      ).setAction(R.string.snack_action_revert_commit, null).show()
-      // TODO: implement revert commit
-    })
+      ).setAction(R.string.snack_action_revert_commit, null /* TODO: implement revert commit */).show()
+    }
     dialog.dismiss()
   }
   return dialog
 }
 
-fun passwordDialog(context: AppCompatActivity, passCb: (String) -> Unit): AlertDialog {
-  val dialogView: View = context.layoutInflater.inflate(R.layout.dialog_password, null)
+fun passwordDialog(context: Context, callback: (String) -> Unit): AlertDialog {
+  val dialogView: View = LayoutInflater.from(context).inflate(R.layout.dialog_password, null)
   val builder: AlertDialog.Builder = AlertDialog.Builder(context)
   builder
       .setTitle(R.string.dialog_pass_title)
       .setView(dialogView)
       .setPositiveButton(R.string.dialog_pass_confirm, null)
-      .setNegativeButton(R.string.dialog_pass_cancel) { dialog, which -> } // Auto dismiss
+      .setNegativeButton(R.string.dialog_pass_cancel) { _, _ -> } // Dismiss
   val dialog: AlertDialog = builder.create()
   dialog.show()
   dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
     val pass = dialogView.findViewById(R.id.pass_dialog_data) as EditText
-    passCb(pass.text.toString())
+    callback(pass.text.toString())
     dialog.dismiss()
   }
   return dialog
@@ -100,40 +100,45 @@ fun createRepoDialog(
 
   // Dialogs get dismissed automatically on click if the builder is used
   // Add this here instead so they are dismissed only by dialog.dismiss() calls
-  dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
+  dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener { launch(UI) {
     val repoNameEditText = dialogView.findViewById(R.id.repo_add_dialog_name) as EditText
     val cloneURLExists = (dialogView.findViewById(R.id.repo_add_dialog_clone) as Switch).isChecked
     val failedRes = if (cloneURLExists) R.string.error_clone_failed else R.string.error_init_failed
     val okRes = if (cloneURLExists) R.string.snack_clone_success else R.string.snack_init_success
     val newRepoName = repoNameEditText.text.toString()
     val newRepository = Repository(context, newRepoName)
-    val creationCallback = Repository.callbackFactory(
-        snack,
-        context.resources.getString(failedRes),
-        context.resources.getString(okRes),
-        {
-          onSuccess(newRepoName)
-        },
-        { t: Throwable ->
-          newRepository.repoFolder.deleteRecursively()
-        }
-    )
+
+    if (newRepository.alreadyExists) {
+      Snackbar.make(
+          snack,
+          R.string.error_repo_name_conflict,
+          Snackbar.LENGTH_LONG
+      ).show()
+      dialog.dismiss()
+      return@launch
+    }
+
+    val creationJob: Job
     if (cloneURLExists) {
       val cloneURLEditText = dialogView.findViewById(R.id.repo_add_dialog_cloneURL) as EditText
       val cloneURL = cloneURLEditText.text.toString()
       if (cloneURL.isEmpty()) {
         cloneURLEditText.error = context.getString(R.string.error_need_clone_URI)
-        return@setOnClickListener
+        return@launch
       } else {
         cloneURLEditText.error = null
       }
       // TODO: maybe add a progress bar or something
-      newRepository.gitClone(snack, cloneURL, creationCallback)
+      creationJob = newRepository.clone(cloneURL)
     } else {
-      newRepository.gitInit(snack, creationCallback)
+      creationJob = newRepository.init()
     }
+    creationJob.withSnackResult(snack, okRes, failedRes, {
+      if (it == null) onSuccess(newRepoName)
+      else newRepository.repoFolder.deleteRecursively()
+    })
     dialog.dismiss()
-  }
+  } }
   return dialog
 }
 
@@ -204,32 +209,16 @@ fun pushPullDialog(
 
     if (remote.isBlank()) return@setOnClickListener
 
-    val gitActionCallback: (SafeAsyncTask) -> Unit = cb@ { completedTask: SafeAsyncTask ->
-      if (completedTask.exception != null) {
-        reportError(
-            snack,
-            context.resources.getString(failSnackRes, remote),
-            completedTask.exception!!
-        )
-        return@cb
+    passwordDialog(context) { pass ->
+      val actionJob = if (operation == RemoteOp.PULL) {
+        target.pull(remote, UsernamePasswordCredentialsProvider("", pass))
+      } else {
+        target.push(remote, UsernamePasswordCredentialsProvider("", pass))
       }
-      Snackbar.make(
-          snack,
+      actionJob.withSnackResult(snack,
           context.resources.getString(successSnackRes, remote),
-          Snackbar.LENGTH_LONG
-      ).show()
+          context.resources.getString(failSnackRes, remote))
     }
-
-    val actionCallback: (String) -> Unit = when (operation) {
-      RemoteOp.PUSH -> { pass: String ->
-        target.gitPush(remote, UsernamePasswordCredentialsProvider("", pass), gitActionCallback)
-      }
-      RemoteOp.PULL -> { pass: String ->
-        target.gitPull(remote, UsernamePasswordCredentialsProvider("", pass), gitActionCallback)
-      }
-    }
-
-    passwordDialog(context, actionCallback)
     dialog.dismiss()
   }
 

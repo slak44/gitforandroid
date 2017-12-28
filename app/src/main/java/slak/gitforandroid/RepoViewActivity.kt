@@ -4,6 +4,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.support.design.widget.FloatingActionButton
+import android.support.design.widget.Snackbar
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
@@ -15,6 +16,11 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.Switch
 import android.widget.TextView
+import kotlinx.coroutines.experimental.CommonPool
+import kotlinx.coroutines.experimental.android.UI
+import kotlinx.coroutines.experimental.launch
+import kotlinx.coroutines.experimental.runBlocking
+import org.eclipse.jgit.api.errors.GitAPIException
 import org.eclipse.jgit.diff.DiffEntry
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider
 import slak.fslistview.FSListView
@@ -84,6 +90,15 @@ class RepoViewActivity : AppCompatActivity() {
     return true
   }
 
+  private fun getDiffs() = launch(CommonPool) {
+    try {
+      fileDiffs = repo!!.diff().await()
+    } catch (e: GitAPIException) {
+      e.printStackTrace()
+      Snackbar.make(fab!!, R.string.error_diff_failed, Snackbar.LENGTH_LONG)
+    }
+  }
+
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     setContentView(R.layout.activity_repo_view)
@@ -136,47 +151,21 @@ class RepoViewActivity : AppCompatActivity() {
       commitDialog(this@RepoViewActivity, repo!!, fab!!)
     }
 
-    repo!!.gitDiff(fab!!, { diffs ->
-      fileDiffs = diffs
-      lv!!.init(this, repo!!.repoFolder, R.layout.list_element, R.color.colorSelected)
-    })
+    launch(UI) {
+      getDiffs().join()
+      lv!!.init(this@RepoViewActivity, repo!!.repoFolder, R.layout.list_element, R.color.colorSelected)
+    }
 
     supportActionBar!!.setDisplayHomeAsUpEnabled(true)
   }
 
   override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
     if (requestCode == FILE_OPEN_REQ_CODE) {
-      repo!!.gitDiff(fab!!, { diffs ->
-        fileDiffs = diffs
-        lv!!.update()
-      })
+      runBlocking { getDiffs().join() }
+      lv!!.update()
       return
     }
     super.onActivityResult(requestCode, resultCode, data)
-  }
-
-  private fun stageSelected() {
-    repo!!.gitAdd(lv!!.selectedPaths, Repository.callbackFactory(
-        fab!!,
-        resources.getString(R.string.error_add_failed),
-        resources.getString(R.string.snack_item_stage_success)
-    ))
-  }
-
-  private fun unstageSelected() {
-    repo!!.gitRm(lv!!.selectedPaths, Repository.callbackFactory(
-        fab!!,
-        resources.getString(R.string.error_rm_failed),
-        resources.getString(R.string.snack_item_unstage_success)
-    ))
-  }
-
-  private fun deleteSelected() {
-    repo!!.gitDelete(lv!!.selectedPaths, Repository.callbackFactory(
-        fab!!,
-        resources.getString(R.string.error_delete_failed),
-        resources.getString(R.string.snack_item_delete_success)
-    ))
   }
 
   private fun openFileManager(target: File) {
@@ -200,39 +189,29 @@ class RepoViewActivity : AppCompatActivity() {
       R.id.menu_repo_view_action_settings -> repoSettingsDialog()
       R.id.menu_repo_view_action_push -> pushPullDialog(this, fab!!, repo!!, RemoteOp.PUSH)
       R.id.menu_repo_view_action_pull -> pushPullDialog(this, fab!!, repo!!, RemoteOp.PULL)
-      R.id.menu_repo_view_action_stage -> stageSelected()
-      R.id.menu_repo_view_action_unstage -> unstageSelected()
-      R.id.menu_repo_view_action_delete -> deleteSelected()
-      R.id.menu_repo_view_action_add_all -> repo!!.gitAddAll(Repository.callbackFactory(
-          fab!!,
-          resources.getString(R.string.error_add_failed),
-          resources.getString(R.string.snack_item_stage_all_success)
-      ))
+      R.id.menu_repo_view_action_stage -> repo!!.add(lv!!.selectedPaths).withSnackResult(fab!!,
+          R.string.snack_item_stage_success, R.string.error_add_failed)
+      R.id.menu_repo_view_action_unstage -> repo!!.removeFromIndex(lv!!.selectedPaths).withSnackResult(fab!!,
+          R.string.snack_item_unstage_success, R.string.error_rm_failed)
+      R.id.menu_repo_view_action_delete -> repo!!.delete(lv!!.selectedPaths).withSnackResult(fab!!,
+          R.string.snack_item_delete_success, R.string.error_delete_failed)
+      R.id.menu_repo_view_action_add_all -> repo!!.addAll().withSnackResult(fab!!,
+          R.string.snack_item_stage_all_success, R.string.error_add_failed)
       R.id.menu_repo_view_action_quick_commit -> {
         // 1. Ask for password
         // 2. Stage everything
         // 3. Commit
         // 4. Push to origin
-        passwordDialog(this, { pass: String ->
-          val gitPushCb = Repository.callbackFactory(
-              fab!!,
-              resources.getString(R.string.error_push_failed),
-              resources.getString(R.string.snack_item_push_success)
-          )
-          val gitQCommitCb = Repository.callbackFactory(
-              fab!!,
-              resources.getString(R.string.error_commit_failed),
-              resources.getString(R.string.snack_item_commit_success),
-              { repo!!.gitPush("origin", UsernamePasswordCredentialsProvider("", pass), gitPushCb) }
-          )
-          val gitAddCb = Repository.callbackFactory(
-              fab!!,
-              resources.getString(R.string.error_add_failed),
-              resources.getString(R.string.snack_item_stage_all_success),
-              { repo!!.gitQuickCommit(gitQCommitCb) }
-          )
-          repo!!.gitAddAll(gitAddCb)
-        })
+        passwordDialog(this, { pass: String -> launch(UI) {
+          repo!!.addAll().withSnackResult(fab!!,
+              R.string.snack_item_stage_all_success, R.string.error_add_failed).join()
+          repo!!.quickCommit().withSnackResult(fab!!,
+              R.string.snack_item_commit_success, R.string.error_commit_failed).join()
+          repo!!.push("origin", UsernamePasswordCredentialsProvider("", pass))
+              .withSnackResult(fab!!,
+                  resources.getString(R.string.snack_item_push_success, "origin"),
+                  resources.getString(R.string.error_push_failed))
+        } })
       }
       else -> return super.onOptionsItemSelected(item)
     }

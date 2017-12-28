@@ -32,11 +32,24 @@ dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     testImplementation 'junit:junit:4.12'
     implementation 'org.eclipse.jgit:org.eclipse.jgit:3.7.1.201504261725-r'
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlin_coroutines_version"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:$kotlin_coroutines_version"
+    implementation "org.jetbrains.anko:anko-coroutines:$anko_version"
     implementation "com.android.support:appcompat-v7:$android_appcompat_version"
     implementation "com.android.support:design:$android_appcompat_version"
     implementation "com.android.support:support-v4:$android_appcompat_version"
-    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
     implementation project(":fslistview")
+}
+
+tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
+    kotlinOptions {
+        apiVersion = "1.2"
+    }
+}
+
+androidExtensions {
+    experimental = true
 }
 
 kotlin {
