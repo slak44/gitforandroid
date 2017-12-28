@@ -36,7 +36,7 @@ class RepoListItemView : FSAbstractListItem {
       FSItemType.NONE -> ColorDrawable(Color.TRANSPARENT)
     }
     drawable.mutate()
-    drawable.setColorFilter(resources.getColor(android.R.color.white, null), PorterDuff.Mode.SRC_ATOP)
+    drawable.setColorFilter(resources.getColor(R.color.white, null), PorterDuff.Mode.SRC_ATOP)
     return drawable
   }
 
@@ -66,14 +66,12 @@ class RepoListItemView : FSAbstractListItem {
   }
 
   var gitStatus: GitStatus = GitStatus.NONE
-    get
     set(value) {
       field = value
       redrawDrawables()
     }
 
   override var type: FSItemType = FSItemType.NONE
-    get
     set(type) {
       field = type
       redrawDrawables()

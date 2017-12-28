@@ -6,6 +6,10 @@ import android.support.design.widget.Snackbar
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.*
+import kotlinx.android.synthetic.main.dialog_add_repo.view.*
+import kotlinx.android.synthetic.main.dialog_commit.view.*
+import kotlinx.android.synthetic.main.dialog_password.view.*
+import kotlinx.android.synthetic.main.dialog_push_pull.view.*
 import kotlinx.coroutines.experimental.Job
 import kotlinx.coroutines.experimental.android.UI
 import kotlinx.coroutines.experimental.launch
@@ -21,36 +25,32 @@ fun commitDialog(context: Context, target: Repository, snack: View): AlertDialog
       .setNegativeButton(R.string.dialog_commit_cancel) { _, _ -> } // Auto dismiss
   val dialog: AlertDialog = builder.create()
 
-  val substitute = dialogView.findViewById(R.id.committerData) as Switch
-  substitute.setOnCheckedChangeListener { _, isChecked: Boolean ->
-    val dataStatus = if (isChecked) View.VISIBLE else View.GONE
-    dialogView.findViewById<TextView>(R.id.authorName).visibility = dataStatus
-    dialogView.findViewById<TextView>(R.id.authorEmail).visibility = dataStatus
+  with(dialogView) {
+    committerData.setOnCheckedChangeListener { _, isChecked: Boolean ->
+      authorName.visibility = if (isChecked) View.VISIBLE else View.GONE
+      authorEmail.visibility = if (isChecked) View.VISIBLE else View.GONE
+    }
+    dialog.show()
+    dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
+      target.commit(
+          authorName.text.toString(),
+          authorEmail.text.toString(),
+          commitMessage.text.toString()).invokeOnCompletion {
+        if (it != null) {
+          Snackbar.make(snack, R.string.error_commit_failed, Snackbar.LENGTH_LONG)
+          it.printStackTrace()
+          return@invokeOnCompletion
+        }
+        Snackbar.make(
+            snack,
+            context.resources.getString(R.string.snack_item_commit_success, commitMessage.text.toString()),
+            Snackbar.LENGTH_LONG
+        ).setAction(R.string.snack_action_revert_commit, null /* TODO: implement revert commit */).show()
+      }
+      dialog.dismiss()
+    }
   }
 
-  dialog.show()
-  dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
-    val message = dialogView.findViewById(R.id.commitMessage) as EditText
-    val name = dialogView.findViewById(R.id.authorName) as EditText
-    val email = dialogView.findViewById(R.id.authorEmail) as EditText
-    var nameString: String? = null
-    var emailString: String? = null
-    if (!name.text.toString().isEmpty()) nameString = name.text.toString()
-    if (!email.text.toString().isEmpty()) emailString = email.text.toString()
-    target.commit(nameString, emailString, message.text.toString()).invokeOnCompletion {
-      if (it != null) {
-        Snackbar.make(snack, R.string.error_commit_failed, Snackbar.LENGTH_LONG)
-        it.printStackTrace()
-        return@invokeOnCompletion
-      }
-      Snackbar.make(
-          snack,
-          context.resources.getString(R.string.snack_item_commit_success, message.text.toString()),
-          Snackbar.LENGTH_LONG
-      ).setAction(R.string.snack_action_revert_commit, null /* TODO: implement revert commit */).show()
-    }
-    dialog.dismiss()
-  }
   return dialog
 }
 
@@ -64,10 +64,11 @@ fun passwordDialog(context: Context, callback: (String) -> Unit): AlertDialog {
       .setNegativeButton(R.string.dialog_pass_cancel) { _, _ -> } // Dismiss
   val dialog: AlertDialog = builder.create()
   dialog.show()
-  dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
-    val pass = dialogView.findViewById(R.id.password) as EditText
-    callback(pass.text.toString())
-    dialog.dismiss()
+  with(dialogView) {
+    dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
+      callback(password.text.toString())
+      dialog.dismiss()
+    }
   }
   return dialog
 }
@@ -77,10 +78,10 @@ fun createRepoDialog(context: Context, snack: View,
   val newRepo = AlertDialog.Builder(context)
   val dialogView = LayoutInflater.from(context).inflate(R.layout.dialog_add_repo, null)
 
-  val toClone = dialogView.findViewById(R.id.cloneSwitch) as Switch
-  toClone.setOnCheckedChangeListener { _, isChecked: Boolean ->
-    dialogView.findViewById<TextView>(R.id.cloneUrl).visibility =
-        if (isChecked) View.VISIBLE else View.GONE
+  with(dialogView) {
+    cloneSwitch.setOnCheckedChangeListener { _, isChecked: Boolean ->
+      cloneUrl.visibility = if (isChecked) View.VISIBLE else View.GONE
+    }
   }
 
   val dialog = newRepo
@@ -89,19 +90,18 @@ fun createRepoDialog(context: Context, snack: View,
       // This listener is set below
       .setPositiveButton(R.string.dialog_add_repo_confirm, null)
       // Dismiss automatically
-      .setNegativeButton(R.string.dialog_add_repo_cancel, { dialog, id -> Unit })
+      .setNegativeButton(R.string.dialog_add_repo_cancel, { _, _ -> })
       .create()
 
   dialog.show()
 
   // Dialogs get dismissed automatically on click if the builder is used
   // Add this here instead so they are dismissed only by dialog.dismiss() calls
-  dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener { launch(UI) {
-    val repoNameEditText = dialogView.findViewById(R.id.newRepoName) as EditText
-    val cloneURLExists = (dialogView.findViewById(R.id.cloneSwitch) as Switch).isChecked
+  dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener { launch(UI) { with(dialogView) {
+    val cloneURLExists = cloneSwitch.isChecked
     val failedRes = if (cloneURLExists) R.string.error_clone_failed else R.string.error_init_failed
     val okRes = if (cloneURLExists) R.string.snack_clone_success else R.string.snack_init_success
-    val newRepoName = repoNameEditText.text.toString()
+    val newRepoName = newRepoName.text.toString()
     val newRepository = Repository(context, newRepoName)
 
     if (newRepository.alreadyExists) {
@@ -116,13 +116,12 @@ fun createRepoDialog(context: Context, snack: View,
 
     val creationJob: Job
     if (cloneURLExists) {
-      val cloneURLEditText = dialogView.findViewById(R.id.cloneUrl) as EditText
-      val cloneURL = cloneURLEditText.text.toString()
+      val cloneURL = cloneUrl.text.toString()
       if (cloneURL.isEmpty()) {
-        cloneURLEditText.error = context.getString(R.string.error_need_clone_URI)
+        cloneUrl.error = context.getString(R.string.error_need_clone_URI)
         return@launch
       } else {
-        cloneURLEditText.error = null
+        cloneUrl.error = null
       }
       // TODO: maybe add a progress bar or something
       creationJob = newRepository.clone(cloneURL)
@@ -134,7 +133,7 @@ fun createRepoDialog(context: Context, snack: View,
       else newRepository.repoFolder.deleteRecursively()
     })
     dialog.dismiss()
-  } }
+  } } }
   return dialog
 }
 
@@ -170,48 +169,42 @@ fun pushPullDialog(context: Context, snack: View, target: Repository,
       .setNegativeButton(R.string.dialog_push_pull_cancel) { _, _ -> } // Dismiss
   val dialog: AlertDialog = builder.create()
 
-  val manualRemote = dialogView.findViewById(R.id.manualRemoteSwitch) as Switch
-  manualRemote.setOnCheckedChangeListener { btn: CompoundButton, isChecked: Boolean ->
-    val dataStatus = if (isChecked) View.GONE else View.VISIBLE
-    dialogView.findViewById<LinearLayout>(R.id.spinnerLayout).visibility = dataStatus
-    dialogView.findViewById<EditText>(R.id.manualRemote).visibility =
-        if (isChecked) View.VISIBLE else View.GONE // just opposite of dataStatus
-  }
-
-  // Add remotes to dropdown
-  val remoteListDropdown = dialogView.findViewById(R.id.remotesDropdown) as Spinner
-  val remotesList = target.listRemotes()
-  if (remotesList.isNotEmpty()) {
-    remoteListDropdown.adapter =
-        ArrayAdapter(context, android.R.layout.simple_spinner_item, remotesList)
-  } else {
-    dialogView.findViewById<TextView>(R.id.noRemotesText).visibility = View.VISIBLE
-    remoteListDropdown.visibility = View.GONE
-  }
-
-  dialog.show()
-  dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
-    val usingManualRemote =
-        (dialogView.findViewById(R.id.manualRemoteSwitch) as Switch).isChecked
-    if (!usingManualRemote && remotesList.isEmpty()) return@setOnClickListener
-
-    val remote: String = if (usingManualRemote)
-      (dialogView.findViewById(R.id.manualRemote) as EditText).text.toString()
-    else remotesList[remoteListDropdown.selectedItemId.toInt()]
-
-    if (remote.isBlank()) return@setOnClickListener
-
-    passwordDialog(context) { pass ->
-      val actionJob = if (operation == RemoteOp.PULL) {
-        target.pull(remote, UsernamePasswordCredentialsProvider("", pass))
-      } else {
-        target.push(remote, UsernamePasswordCredentialsProvider("", pass))
-      }
-      actionJob.withSnackResult(snack,
-          context.resources.getString(successSnackRes, remote),
-          context.resources.getString(failSnackRes, remote))
+  with(dialogView) {
+    manualRemoteSwitch.setOnCheckedChangeListener { _, isChecked: Boolean ->
+      spinnerLayout.visibility = if (isChecked) View.GONE else View.VISIBLE
+      manualRemote.visibility = if (isChecked) View.VISIBLE else View.GONE
     }
-    dialog.dismiss()
+    // Add remotes to dropdown
+    val remotesList = target.listRemotes()
+    if (remotesList.isNotEmpty()) {
+      remotesDropdown.adapter =
+          ArrayAdapter(context, android.R.layout.simple_spinner_item, remotesList)
+    } else {
+      noRemotesText.visibility = View.VISIBLE
+      remotesDropdown.visibility = View.GONE
+    }
+    dialog.show()
+    dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
+      if (!manualRemoteSwitch.isChecked && remotesList.isEmpty()) return@setOnClickListener
+
+      val remote: String =
+          if (manualRemoteSwitch.isChecked) manualRemote.text.toString()
+          else remotesList[remotesDropdown.selectedItemId.toInt()]
+
+      if (remote.isBlank()) return@setOnClickListener
+
+      passwordDialog(context) { pass ->
+        val actionJob = if (operation == RemoteOp.PULL) {
+          target.pull(remote, UsernamePasswordCredentialsProvider("", pass))
+        } else {
+          target.push(remote, UsernamePasswordCredentialsProvider("", pass))
+        }
+        actionJob.withSnackResult(snack,
+            context.resources.getString(successSnackRes, remote),
+            context.resources.getString(failSnackRes, remote))
+      }
+      dialog.dismiss()
+    }
   }
 
   return dialog

@@ -3,16 +3,14 @@ package slak.gitforandroid
 import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
-import android.support.design.widget.FloatingActionButton
 import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.Toolbar
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
-import android.widget.AdapterView
+import android.view.View
 import android.widget.ArrayAdapter
-import android.widget.ListView
 import android.widget.TextView
+import kotlinx.android.synthetic.main.activity_main.*
 import java.util.*
 
 class MainActivity : AppCompatActivity() {
@@ -20,10 +18,8 @@ class MainActivity : AppCompatActivity() {
     const val INTENT_REPO_NAME = "slak.gitforandroid.REPO_NAME"
   }
 
-  internal var repoNames: ArrayList<String> = ArrayList()
-  internal var listElements: ArrayAdapter<String>? = null
-
-  private var fab: FloatingActionButton? = null
+  private var repoNames: ArrayList<String> = ArrayList()
+  private var listElements: ArrayAdapter<String>? = null
 
   private fun addRepoNames() {
     repoNames.clear()
@@ -40,7 +36,6 @@ class MainActivity : AppCompatActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     setContentView(R.layout.activity_main)
-    val toolbar = findViewById(R.id.toolbar) as Toolbar
     setSupportActionBar(toolbar)
 
     Thread.setDefaultUncaughtExceptionHandler {
@@ -52,7 +47,7 @@ class MainActivity : AppCompatActivity() {
       val fatalError = AlertDialog.Builder(this@MainActivity)
       fatalError
           .setTitle(R.string.error_storage_unavailable)
-          .setNegativeButton(R.string.app_quit) { dialog, id ->
+          .setNegativeButton(R.string.app_quit) { _, _ ->
             // It is impossible to have more than one Activity on the stack at this point
             // This means the following call terminates the app
             System.exit(1)
@@ -62,19 +57,17 @@ class MainActivity : AppCompatActivity() {
       return
     }
 
-    val repoList = findViewById(R.id.repoList) as ListView
     addRepoNames()
     listElements = ArrayAdapter(this, R.layout.list_element_main, repoNames)
     repoList.adapter = listElements
-    repoList.setOnItemClickListener { parent: AdapterView<*>, view, position: Int, id: Long ->
+    repoList.setOnItemClickListener { _, view: View, _, _ ->
       val repoViewIntent = Intent(this@MainActivity, RepoViewActivity::class.java)
       repoViewIntent.putExtra(INTENT_REPO_NAME, (view as TextView).text.toString())
       startActivity(repoViewIntent)
     }
 
-    fab = findViewById(R.id.fab) as FloatingActionButton
-    fab!!.setOnClickListener {
-      createRepoDialog(this, fab!!, { newRepoName ->
+    fab.setOnClickListener {
+      createRepoDialog(this, fab, { newRepoName ->
         repoNames.add(newRepoName)
         listElements!!.notifyDataSetChanged()
       })
@@ -82,18 +75,12 @@ class MainActivity : AppCompatActivity() {
   }
 
   override fun onCreateOptionsMenu(menu: Menu): Boolean {
-    // Inflate the menu; this adds items to the action bar if it is present.
     menuInflater.inflate(R.menu.menu_main, menu)
     return true
   }
 
   override fun onOptionsItemSelected(item: MenuItem): Boolean {
-    // Handle action bar item clicks here. The action bar will
-    // automatically handle clicks on the Home/Up button, so long
-    // as you specify a parent activity in AndroidManifest.xml.
-    val id = item.itemId
-
-    if (id == R.id.settings) {
+    if (item.itemId == R.id.settings) {
       val settingsIntent = Intent(this@MainActivity, SettingsActivity::class.java)
       startActivity(settingsIntent)
       return true

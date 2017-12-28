@@ -34,7 +34,7 @@
         tools:showIn="@layout/activity_repo_view">
 
         <slak.fslistview.FSListView
-            android:id="@+id/currentDirectory"
+            android:id="@+id/fileList"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
 

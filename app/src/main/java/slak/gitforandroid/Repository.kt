@@ -113,9 +113,9 @@ class Repository(private val context: Context, name: String) {
 
   fun commit(committer: PersonIdent?, message: String) = commit(committer, committer, message)
 
-  fun commit(name: String?, email: String?, message: String): Job {
+  fun commit(name: String, email: String, message: String): Job {
     val pi: PersonIdent? =
-        if (name != null && email != null) PersonIdent(name, email)
+        if (name.isEmpty() && email.isEmpty()) PersonIdent(name, email)
         else null
     return commit(pi, pi, message)
   }
