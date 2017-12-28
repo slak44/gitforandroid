@@ -5,4 +5,5 @@
     <color name="gitModified">#FFF7B613</color>
     <color name="gitMoved">#FFFCFF5B</color>
     <color name="transparent">#00FFDEAD</color>
+    <color name="white">#FFFFFFFF</color>
 </resources>

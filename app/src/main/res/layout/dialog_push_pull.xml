@@ -32,7 +32,7 @@
             android:id="@+id/dialog_push_pull_dropdown"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:drawableEnd="@drawable/black_ic_arrow_drop_down_24dp"/>
+            android:drawableEnd="@drawable/ic_arrow_drop_down_black_24dp"/>
 
         <TextView
             android:id="@+id/dialog_push_pull_dropdown_empty"

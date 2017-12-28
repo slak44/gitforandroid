@@ -182,6 +182,17 @@ class RepoViewActivity : AppCompatActivity() {
     startActivity(Intent.createChooser(intent, getString(R.string.intent_open_manager_chooser)))
   }
 
+  override fun onPrepareOptionsMenu(menu: Menu): Boolean {
+    for (item in arrayOf(
+        R.id.push,
+        R.id.pull,
+        R.id.stage,
+        R.id.unstage,
+        R.id.delete
+    )) menu.findItem(item)?.iconTint(this, R.color.white)
+    return super.onPrepareOptionsMenu(menu)
+  }
+
   override fun onOptionsItemSelected(item: MenuItem): Boolean {
     when (item.itemId) {
       android.R.id.home -> onBackPressed() // Behave like the hardware back button

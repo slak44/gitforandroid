@@ -31,8 +31,8 @@ class RepoListItemView : FSAbstractListItem {
 
   private fun getTypeDrawable(): Drawable {
     val drawable = when (type) {
-      FSItemType.FILE -> context.getDrawable(R.drawable.black_ic_file_24dp)
-      FSItemType.FOLDER -> context.getDrawable(R.drawable.black_ic_folder_24dp)
+      FSItemType.FILE -> context.getDrawable(R.drawable.ic_file_black_24dp)
+      FSItemType.FOLDER -> context.getDrawable(R.drawable.ic_folder_black_24dp)
       FSItemType.NONE -> ColorDrawable(Color.TRANSPARENT)
     }
     drawable.mutate()
@@ -42,9 +42,9 @@ class RepoListItemView : FSAbstractListItem {
 
   private fun getStatusDrawable(): Drawable {
     val drawableId = when (gitStatus) {
-      GitStatus.ADDED -> R.drawable.white_ic_add_24dp
-      GitStatus.MODIFIED -> R.drawable.black_ic_create_24dp
-      GitStatus.RENAMED, GitStatus.COPIED -> R.drawable.black_ic_content_copy_24dp
+      GitStatus.ADDED -> R.drawable.ic_add_black_24dp
+      GitStatus.MODIFIED -> R.drawable.ic_create_black_24dp
+      GitStatus.RENAMED, GitStatus.COPIED -> R.drawable.ic_content_copy_black_24dp
       GitStatus.NONE -> 0
     }
     val drawable =

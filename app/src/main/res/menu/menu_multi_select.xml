@@ -5,19 +5,19 @@
 
     <item
         android:id="@+id/stage"
-        android:icon="@drawable/white_ic_add_24dp"
+        android:icon="@drawable/ic_add_black_24dp"
         android:orderInCategory="100"
         android:title="@string/menu_repo_view_stage"
         app:showAsAction="ifRoom"/>
     <item
         android:id="@+id/unstage"
-        android:icon="@drawable/white_ic_remove_24dp"
+        android:icon="@drawable/ic_remove_black_24dp"
         android:orderInCategory="101"
         android:title="@string/menu_repo_view_unstage"
         app:showAsAction="ifRoom"/>
     <item
         android:id="@+id/delete"
-        android:icon="@drawable/white_ic_delete_24dp"
+        android:icon="@drawable/ic_delete_black_24dp"
         android:orderInCategory="105"
         android:title="@string/menu_repo_view_delete"
         app:showAsAction="ifRoom"/>

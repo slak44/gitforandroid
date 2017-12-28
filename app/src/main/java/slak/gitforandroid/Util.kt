@@ -1,10 +1,14 @@
 package slak.gitforandroid
 
 import android.content.Context
+import android.content.res.Resources
+import android.graphics.PorterDuff
 import android.preference.PreferenceManager
+import android.support.annotation.ColorRes
 import android.support.annotation.StringRes
 import android.support.design.widget.Snackbar
 import android.util.Log
+import android.view.MenuItem
 import android.view.View
 import kotlinx.coroutines.experimental.*
 import kotlin.coroutines.experimental.CoroutineContext
@@ -55,4 +59,14 @@ fun reportError(snack: View, formatted: String, e: Throwable) {
 // FIXME
 fun getStringSetting(context: Context, key: String): String {
   return PreferenceManager.getDefaultSharedPreferences(context).getString(key, "")
+}
+
+/**
+ * Emulates android:iconTint. Must be called in onPrepareOptionsMenu for each icon.
+ */
+fun MenuItem.iconTint(context: Context, @ColorRes colorRes: Int) {
+  val color = context.resources.getColor(colorRes, context.theme)
+  val drawable = this.icon
+  drawable.setColorFilter(color, PorterDuff.Mode.SRC_IN)
+  this.icon = drawable
 }
