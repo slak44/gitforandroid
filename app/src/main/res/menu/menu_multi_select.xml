@@ -1,21 +1,24 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    tools:context=".RepoViewActivity">
+      xmlns:app="http://schemas.android.com/apk/res-auto"
+      xmlns:tools="http://schemas.android.com/tools"
+      tools:context=".RepoViewActivity">
 
-    <item android:id="@+id/menu_repo_view_action_stage"
-        android:title="@string/menu_repo_view_stage"
+    <item
+        android:id="@+id/stage"
         android:icon="@drawable/white_ic_add_24dp"
         android:orderInCategory="100"
-        app:showAsAction="ifRoom" />
-    <item android:id="@+id/menu_repo_view_action_unstage"
-        android:title="@string/menu_repo_view_unstage"
+        android:title="@string/menu_repo_view_stage"
+        app:showAsAction="ifRoom"/>
+    <item
+        android:id="@+id/unstage"
         android:icon="@drawable/white_ic_remove_24dp"
         android:orderInCategory="101"
-        app:showAsAction="ifRoom" />
-    <item android:id="@+id/menu_repo_view_action_delete"
-        android:title="@string/menu_repo_view_delete"
+        android:title="@string/menu_repo_view_unstage"
+        app:showAsAction="ifRoom"/>
+    <item
+        android:id="@+id/delete"
         android:icon="@drawable/white_ic_delete_24dp"
         android:orderInCategory="105"
-        app:showAsAction="ifRoom" />
+        android:title="@string/menu_repo_view_delete"
+        app:showAsAction="ifRoom"/>
 </menu>

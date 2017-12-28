@@ -185,19 +185,19 @@ class RepoViewActivity : AppCompatActivity() {
   override fun onOptionsItemSelected(item: MenuItem): Boolean {
     when (item.itemId) {
       android.R.id.home -> onBackPressed() // Behave like the hardware back button
-      R.id.menu_repo_view_action_open_manager -> openFileManager(lv!!.currentDirectory)
-      R.id.menu_repo_view_action_settings -> repoSettingsDialog()
-      R.id.menu_repo_view_action_push -> pushPullDialog(this, fab!!, repo!!, RemoteOp.PUSH)
-      R.id.menu_repo_view_action_pull -> pushPullDialog(this, fab!!, repo!!, RemoteOp.PULL)
-      R.id.menu_repo_view_action_stage -> repo!!.add(lv!!.selectedPaths).withSnackResult(fab!!,
+      R.id.open_file_manager -> openFileManager(lv!!.currentDirectory)
+      R.id.settings -> repoSettingsDialog()
+      R.id.push -> pushPullDialog(this, fab!!, repo!!, RemoteOp.PUSH)
+      R.id.pull -> pushPullDialog(this, fab!!, repo!!, RemoteOp.PULL)
+      R.id.stage -> repo!!.add(lv!!.selectedPaths).withSnackResult(fab!!,
           R.string.snack_item_stage_success, R.string.error_add_failed)
-      R.id.menu_repo_view_action_unstage -> repo!!.removeFromIndex(lv!!.selectedPaths).withSnackResult(fab!!,
+      R.id.unstage -> repo!!.removeFromIndex(lv!!.selectedPaths).withSnackResult(fab!!,
           R.string.snack_item_unstage_success, R.string.error_rm_failed)
-      R.id.menu_repo_view_action_delete -> repo!!.delete(lv!!.selectedPaths).withSnackResult(fab!!,
+      R.id.delete -> repo!!.delete(lv!!.selectedPaths).withSnackResult(fab!!,
           R.string.snack_item_delete_success, R.string.error_delete_failed)
-      R.id.menu_repo_view_action_add_all -> repo!!.addAll().withSnackResult(fab!!,
+      R.id.stage_all -> repo!!.addAll().withSnackResult(fab!!,
           R.string.snack_item_stage_all_success, R.string.error_add_failed)
-      R.id.menu_repo_view_action_quick_commit -> {
+      R.id.quick_commit -> {
         // 1. Ask for password
         // 2. Stage everything
         // 3. Commit

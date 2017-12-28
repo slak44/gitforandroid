@@ -93,7 +93,7 @@ class MainActivity : AppCompatActivity() {
     // as you specify a parent activity in AndroidManifest.xml.
     val id = item.itemId
 
-    if (id == R.id.menu_main_action_settings) {
+    if (id == R.id.settings) {
       val settingsIntent = Intent(this@MainActivity, SettingsActivity::class.java)
       startActivity(settingsIntent)
       return true
