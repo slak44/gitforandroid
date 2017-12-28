@@ -9,9 +9,9 @@ enum class FSItemType {
 }
 
 abstract class FSAbstractListItem : TextView {
-  constructor(context: Context) : super(context) {}
-  constructor(context: Context, set: AttributeSet) : super(context, set) {}
-  constructor(context: Context, set: AttributeSet, defStyle: Int) : super(context, set, defStyle) {}
+  constructor(context: Context) : super(context)
+  constructor(context: Context, set: AttributeSet) : super(context, set)
+  constructor(context: Context, set: AttributeSet, defStyle: Int) : super(context, set, defStyle)
 
   abstract var type: FSItemType
 }

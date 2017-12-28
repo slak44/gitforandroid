@@ -1,5 +1,6 @@
 package slak.gitforandroid
 
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -7,10 +8,7 @@ import android.support.design.widget.FloatingActionButton
 import android.support.design.widget.Snackbar
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
-import android.view.Menu
-import android.view.MenuItem
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.TextView
 import kotlinx.android.synthetic.main.activity_repo_view.*
 import kotlinx.android.synthetic.main.dialog_repo_settings.*
@@ -102,7 +100,7 @@ class RepoViewActivity : AppCompatActivity() {
     fileList.onMultiSelectEnd = { inflateMenu(R.menu.menu_repo_view) }
 
     fileList.onChildViewPrepare = cb@ {
-      context: AppCompatActivity, file: File, convertView: View?, parent: ViewGroup ->
+      context: Context, file: File, convertView: View?, parent: ViewGroup ->
       val path = repo.relativize(file.toURI()).toString()
       val newGitStatus: GitStatus = fileDiffs
           .firstOrNull { it.newPath == path }
@@ -112,7 +110,7 @@ class RepoViewActivity : AppCompatActivity() {
           convertView.gitStatus == newGitStatus) {
         return@cb convertView
       }
-      val view = context.layoutInflater.inflate(R.layout.list_element, parent, false)
+      val view = LayoutInflater.from(context).inflate(R.layout.list_element, parent, false)
           as RepoListItemView
       view.gitStatus = newGitStatus
       return@cb view

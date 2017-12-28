@@ -3,9 +3,9 @@ package slak.fslistview
 import android.content.Context
 import android.support.annotation.ColorRes
 import android.support.annotation.LayoutRes
-import android.support.v7.app.AppCompatActivity
 import android.util.AttributeSet
 import android.util.Log
+import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
@@ -25,12 +25,12 @@ class FSListView : ListView {
   private var listElements: FSArrayAdapter? = null
   private var folderStack = Stack<SelectableAdapterModel<File>>()
   private var root: File? = null
-  private @LayoutRes var listLayout: Int? = null
+  private @LayoutRes var listElementLayout: Int? = null
 
   private var isMultiSelecting = false
 
   val selectedPaths: ArrayList<String>
-    get() = SelectableAdapterModel.getSelectedModels(nodes).mapTo(ArrayList<String>()) {
+    get() = SelectableAdapterModel.getSelectedModels(nodes).mapTo(ArrayList()) {
       nodes[it].thing.toURI().relativize(root!!.toURI()).toString()
     }
 
@@ -38,7 +38,6 @@ class FSListView : ListView {
    * Set to false to disable multi-select functionality
    */
   var useMultiSelect = true
-    get set
   /**
    * Called when an item is long-pressed.
    */
@@ -60,10 +59,10 @@ class FSListView : ListView {
    * function should try to recycle the given View? if it is possible, and inflate a new layout only
    * if necessary.
    */
-  var onChildViewPrepare: (AppCompatActivity, File, View?, ViewGroup) -> FSAbstractListItem
-      = { context: AppCompatActivity, file: File, convertView: View?, parent: ViewGroup ->
+  var onChildViewPrepare: (Context, File, View?, ViewGroup) -> FSAbstractListItem
+      = { context: Context, file: File, convertView: View?, parent: ViewGroup ->
     if (convertView != null && convertView is FSAbstractListItem) convertView
-    else context.layoutInflater.inflate(listLayout!!, parent, false) as FSAbstractListItem
+    else LayoutInflater.from(context).inflate(listElementLayout!!, parent, false) as FSAbstractListItem
   }
 
   constructor(context: Context) : this(context, null)
@@ -74,19 +73,19 @@ class FSListView : ListView {
    * Populate the list with files from the given root.
    * @param root the root of the navigation
    */
-  fun init(activity: AppCompatActivity, root: File, @LayoutRes listElement: Int, @ColorRes selectedColor: Int) {
-    this.listLayout = listElement
+  fun init(context: Context, root: File, @LayoutRes listElement: Int, @ColorRes selectedColor: Int) {
+    listElementLayout = listElement
     this.root = root
     // Don't bother doing anything in the editor
     if (isInEditMode) return
     folderStack.push(SelectableAdapterModel(root))
-    listElements = FSArrayAdapter(activity, listElement, nodes, this)
+    listElements = FSArrayAdapter(context, listElement, nodes, this)
     adapter = listElements
     refresh()
     fireFolderChangeEvents()
-    onItemClickListener = AdapterView.OnItemClickListener { parent, view, position, id ->
+    setOnItemClickListener { parent, view, position, id ->
       // Directory empty, nothing to do here
-      if (nodes.size == 0) return@OnItemClickListener
+      if (nodes.size == 0) return@setOnItemClickListener
       if (useMultiSelect) {
         // Clicked on a selected item: deselect it
         if (nodes[position].selected && isMultiSelecting) {
@@ -97,38 +96,36 @@ class FSListView : ListView {
             isMultiSelecting = false
             onMultiSelectEnd()
           }
-          return@OnItemClickListener
+          return@setOnItemClickListener
           // Clicked on a unselected item in multi-select: select it
         } else if (isMultiSelecting) {
           nodes[position].selected = true
           view.setBackgroundColor(
-              resources.getColor(selectedColor, activity.theme))
-          return@OnItemClickListener
+              resources.getColor(selectedColor, context.theme))
+          return@setOnItemClickListener
         }
       }
-      if (view !is FSAbstractListItem) return@OnItemClickListener
-      if (view.type == FSItemType.FOLDER) {
-        folderStack.push(nodes[position])
-        refresh()
-        fireFolderChangeEvents()
-      } else if (view.type == FSItemType.FILE) {
-        onFileOpen(nodes[position].thing)
-      } else {
-        Log.w(TAG, "Unhandled FSItemType!")
+      if (view !is FSAbstractListItem) return@setOnItemClickListener
+      when {
+        view.type == FSItemType.FOLDER -> {
+          folderStack.push(nodes[position])
+          refresh()
+          fireFolderChangeEvents()
+        }
+        view.type == FSItemType.FILE -> onFileOpen(nodes[position].thing)
+        else -> Log.w(TAG, "Unhandled FSItemType!")
       }
     }
-    onItemLongClickListener = AdapterView.OnItemLongClickListener {
-      parent, view, position, id ->
+    setOnItemLongClickListener { _, view, position, _ ->
       if (useMultiSelect) {
         isMultiSelecting = true
         // No item was checked: style the toolbar for multi-select
         if (SelectableAdapterModel.getSelectedModels(nodes).size == 0) onMultiSelectStart()
         nodes[position].selected = true
-        view.setBackgroundColor(
-            resources.getColor(selectedColor, activity.theme))
-        return@OnItemLongClickListener true
+        view.setBackgroundColor(resources.getColor(selectedColor, context.theme))
+        return@setOnItemLongClickListener true
       }
-      return@OnItemLongClickListener false
+      return@setOnItemLongClickListener false
     }
   }
 
@@ -185,7 +182,7 @@ class FSListView : ListView {
    */
   fun goUp(): Boolean {
     if (folderStack.size <= 1) {
-      folderStack = Stack<SelectableAdapterModel<File>>()
+      folderStack = Stack()
       return false
     } else {
       folderStack.pop()

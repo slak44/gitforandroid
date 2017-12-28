@@ -1,19 +1,17 @@
 package slak.fslistview
 
+import android.content.Context
 import android.support.annotation.LayoutRes
-import android.support.v7.app.AppCompatActivity
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
-
 import java.io.File
 import java.util.ArrayList
 
-internal class FSArrayAdapter(
-    private val context: AppCompatActivity,
-    @LayoutRes resource: Int,
-    private val nodes: ArrayList<SelectableAdapterModel<File>>,
-    private val lv: FSListView
+internal class FSArrayAdapter(context: Context,
+                              @LayoutRes resource: Int,
+                              private val nodes: ArrayList<SelectableAdapterModel<File>>,
+                              private val lv: FSListView
 ) : ArrayAdapter<SelectableAdapterModel<File>>(context, resource, nodes) {
 
   override fun getViewTypeCount(): Int = 2
