@@ -6,22 +6,21 @@
               android:padding="?android:attr/dialogPreferredPadding">
 
     <EditText
-        android:id="@+id/dialog_commit_message"
+        android:id="@+id/commitMessage"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:hint="@string/dialog_commit_message_hint"
-        />
+        android:hint="@string/dialog_commit_message_hint"/>
 
     <Switch
-        android:id="@+id/dialog_commit_substitute"
+        android:id="@+id/committerData"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:text="@string/dialog_commit_substitute_switch"/>
 
     <EditText
-        android:id="@+id/dialog_commit_name"
+        android:id="@+id/authorName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:ems="10"
@@ -30,7 +29,7 @@
         android:visibility="gone"/>
 
     <EditText
-        android:id="@+id/dialog_commit_email"
+        android:id="@+id/authorEmail"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:ems="10"

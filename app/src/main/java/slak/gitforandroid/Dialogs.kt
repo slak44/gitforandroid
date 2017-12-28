@@ -21,18 +21,18 @@ fun commitDialog(context: Context, target: Repository, snack: View): AlertDialog
       .setNegativeButton(R.string.dialog_commit_cancel) { _, _ -> } // Auto dismiss
   val dialog: AlertDialog = builder.create()
 
-  val substitute = dialogView.findViewById(R.id.dialog_commit_substitute) as Switch
+  val substitute = dialogView.findViewById(R.id.committerData) as Switch
   substitute.setOnCheckedChangeListener { _, isChecked: Boolean ->
     val dataStatus = if (isChecked) View.VISIBLE else View.GONE
-    dialogView.findViewById<TextView>(R.id.dialog_commit_name).visibility = dataStatus
-    dialogView.findViewById<TextView>(R.id.dialog_commit_email).visibility = dataStatus
+    dialogView.findViewById<TextView>(R.id.authorName).visibility = dataStatus
+    dialogView.findViewById<TextView>(R.id.authorEmail).visibility = dataStatus
   }
 
   dialog.show()
   dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
-    val message = dialogView.findViewById(R.id.dialog_commit_message) as EditText
-    val name = dialogView.findViewById(R.id.dialog_commit_name) as EditText
-    val email = dialogView.findViewById(R.id.dialog_commit_email) as EditText
+    val message = dialogView.findViewById(R.id.commitMessage) as EditText
+    val name = dialogView.findViewById(R.id.authorName) as EditText
+    val email = dialogView.findViewById(R.id.authorEmail) as EditText
     var nameString: String? = null
     var emailString: String? = null
     if (!name.text.toString().isEmpty()) nameString = name.text.toString()
@@ -65,7 +65,7 @@ fun passwordDialog(context: Context, callback: (String) -> Unit): AlertDialog {
   val dialog: AlertDialog = builder.create()
   dialog.show()
   dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
-    val pass = dialogView.findViewById(R.id.pass_dialog_data) as EditText
+    val pass = dialogView.findViewById(R.id.password) as EditText
     callback(pass.text.toString())
     dialog.dismiss()
   }
@@ -77,9 +77,9 @@ fun createRepoDialog(context: Context, snack: View,
   val newRepo = AlertDialog.Builder(context)
   val dialogView = LayoutInflater.from(context).inflate(R.layout.dialog_add_repo, null)
 
-  val toClone = dialogView.findViewById(R.id.repo_add_dialog_clone) as Switch
+  val toClone = dialogView.findViewById(R.id.cloneSwitch) as Switch
   toClone.setOnCheckedChangeListener { _, isChecked: Boolean ->
-    dialogView.findViewById<TextView>(R.id.repo_add_dialog_cloneURL).visibility =
+    dialogView.findViewById<TextView>(R.id.cloneUrl).visibility =
         if (isChecked) View.VISIBLE else View.GONE
   }
 
@@ -97,8 +97,8 @@ fun createRepoDialog(context: Context, snack: View,
   // Dialogs get dismissed automatically on click if the builder is used
   // Add this here instead so they are dismissed only by dialog.dismiss() calls
   dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener { launch(UI) {
-    val repoNameEditText = dialogView.findViewById(R.id.repo_add_dialog_name) as EditText
-    val cloneURLExists = (dialogView.findViewById(R.id.repo_add_dialog_clone) as Switch).isChecked
+    val repoNameEditText = dialogView.findViewById(R.id.newRepoName) as EditText
+    val cloneURLExists = (dialogView.findViewById(R.id.cloneSwitch) as Switch).isChecked
     val failedRes = if (cloneURLExists) R.string.error_clone_failed else R.string.error_init_failed
     val okRes = if (cloneURLExists) R.string.snack_clone_success else R.string.snack_init_success
     val newRepoName = repoNameEditText.text.toString()
@@ -116,7 +116,7 @@ fun createRepoDialog(context: Context, snack: View,
 
     val creationJob: Job
     if (cloneURLExists) {
-      val cloneURLEditText = dialogView.findViewById(R.id.repo_add_dialog_cloneURL) as EditText
+      val cloneURLEditText = dialogView.findViewById(R.id.cloneUrl) as EditText
       val cloneURL = cloneURLEditText.text.toString()
       if (cloneURL.isEmpty()) {
         cloneURLEditText.error = context.getString(R.string.error_need_clone_URI)
@@ -170,33 +170,33 @@ fun pushPullDialog(context: Context, snack: View, target: Repository,
       .setNegativeButton(R.string.dialog_push_pull_cancel) { _, _ -> } // Dismiss
   val dialog: AlertDialog = builder.create()
 
-  val manualRemote = dialogView.findViewById(R.id.dialog_push_pull_switch_remote) as Switch
+  val manualRemote = dialogView.findViewById(R.id.manualRemoteSwitch) as Switch
   manualRemote.setOnCheckedChangeListener { btn: CompoundButton, isChecked: Boolean ->
     val dataStatus = if (isChecked) View.GONE else View.VISIBLE
-    dialogView.findViewById<LinearLayout>(R.id.dialog_push_pull_spinner_layout).visibility = dataStatus
-    dialogView.findViewById<EditText>(R.id.dialog_push_pull_manual_remote).visibility =
+    dialogView.findViewById<LinearLayout>(R.id.spinnerLayout).visibility = dataStatus
+    dialogView.findViewById<EditText>(R.id.manualRemote).visibility =
         if (isChecked) View.VISIBLE else View.GONE // just opposite of dataStatus
   }
 
   // Add remotes to dropdown
-  val remoteListDropdown = dialogView.findViewById(R.id.dialog_push_pull_dropdown) as Spinner
+  val remoteListDropdown = dialogView.findViewById(R.id.remotesDropdown) as Spinner
   val remotesList = target.listRemotes()
   if (remotesList.isNotEmpty()) {
     remoteListDropdown.adapter =
         ArrayAdapter(context, android.R.layout.simple_spinner_item, remotesList)
   } else {
-    dialogView.findViewById<TextView>(R.id.dialog_push_pull_dropdown_empty).visibility = View.VISIBLE
+    dialogView.findViewById<TextView>(R.id.noRemotesText).visibility = View.VISIBLE
     remoteListDropdown.visibility = View.GONE
   }
 
   dialog.show()
   dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
     val usingManualRemote =
-        (dialogView.findViewById(R.id.dialog_push_pull_switch_remote) as Switch).isChecked
+        (dialogView.findViewById(R.id.manualRemoteSwitch) as Switch).isChecked
     if (!usingManualRemote && remotesList.isEmpty()) return@setOnClickListener
 
     val remote: String = if (usingManualRemote)
-      (dialogView.findViewById(R.id.dialog_push_pull_manual_remote) as EditText).text.toString()
+      (dialogView.findViewById(R.id.manualRemote) as EditText).text.toString()
     else remotesList[remoteListDropdown.selectedItemId.toInt()]
 
     if (remote.isBlank()) return@setOnClickListener

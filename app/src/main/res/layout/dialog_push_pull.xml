@@ -11,31 +11,31 @@
         android:orientation="horizontal">
 
         <Switch
-            android:id="@+id/dialog_push_pull_switch_remote"
+            android:id="@+id/manualRemoteSwitch"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_gravity="center"
+            android:layout_marginBottom="@dimen/switch_padding"
             android:elegantTextHeight="true"
             android:gravity="end"
-            android:layout_marginBottom="@dimen/switch_padding"
             android:text="@string/dialog_push_pull_switch_existing_remote"/>
 
     </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/dialog_push_pull_spinner_layout"
+        android:id="@+id/spinnerLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal">
 
         <Spinner
-            android:id="@+id/dialog_push_pull_dropdown"
+            android:id="@+id/remotesDropdown"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:drawableEnd="@drawable/ic_arrow_drop_down_black_24dp"/>
 
         <TextView
-            android:id="@+id/dialog_push_pull_dropdown_empty"
+            android:id="@+id/noRemotesText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
@@ -46,7 +46,7 @@
     </LinearLayout>
 
     <EditText
-        android:id="@+id/dialog_push_pull_manual_remote"
+        android:id="@+id/manualRemote"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"

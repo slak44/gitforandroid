@@ -53,9 +53,9 @@ class RepoViewActivity : AppCompatActivity() {
         .setView(layout)
     val dialog = builder.create()
     dialog.show()
-    val renameEditText = layout.findViewById(R.id.dialog_repo_settings_rename) as EditText
+    val renameEditText = layout.findViewById(R.id.renameRepo) as EditText
     renameEditText.setText(toolbar!!.subtitle)
-    (layout.findViewById(R.id.dialog_repo_settings_btn_rename) as Button)
+    (layout.findViewById(R.id.renameRepoBtn) as Button)
         .setOnClickListener {
           if (renameEditText.text.isBlank()) {
             renameEditText.error = getString(R.string.error_field_blank)
@@ -74,8 +74,8 @@ class RepoViewActivity : AppCompatActivity() {
           toolbar!!.subtitle = renameEditText.text
           dialog.dismiss()
         }
-    val deleteBtn = layout.findViewById(R.id.dialog_repo_settings_btn_delete) as Button
-    (layout.findViewById(R.id.dialog_repo_settings_sw_enable_delete) as Switch)
+    val deleteBtn = layout.findViewById(R.id.deleteRepoBtn) as Button
+    (layout.findViewById(R.id.enableDeleteSwitch) as Switch)
         .setOnCheckedChangeListener { button, isChecked ->
           deleteBtn.isEnabled = isChecked
         }
@@ -109,7 +109,7 @@ class RepoViewActivity : AppCompatActivity() {
     toolbar!!.subtitle = repoName
     repo = Repository(this, repoName)
 
-    lv = findViewById(R.id.current_directory) as FSListView
+    lv = findViewById(R.id.currentDirectory) as FSListView
     lv!!.onMultiSelectStart = { inflateMenu(R.menu.menu_multi_select) }
     lv!!.onMultiSelectEnd = { inflateMenu(R.menu.menu_repo_view) }
 
@@ -130,7 +130,7 @@ class RepoViewActivity : AppCompatActivity() {
       return@cb view
     }
 
-    val emptyFolderText = findViewById<TextView>(R.id.repo_view_empty_folder)!!
+    val emptyFolderText = findViewById<TextView>(R.id.emptyFolder)!!
     lv!!.onFolderChange = { old, new ->
       if (new.list().isEmpty()) {
         emptyFolderText.visibility = View.VISIBLE

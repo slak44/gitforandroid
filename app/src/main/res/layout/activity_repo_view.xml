@@ -34,12 +34,12 @@
         tools:showIn="@layout/activity_repo_view">
 
         <slak.fslistview.FSListView
-            android:id="@+id/current_directory"
+            android:id="@+id/currentDirectory"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
 
         <TextView
-            android:id="@+id/repo_view_empty_folder"
+            android:id="@+id/emptyFolder"
             style="@style/ApplicationTheme.FSListViewEmptyFolder"
             xmlns:android="http://schemas.android.com/apk/res/android"
             android:text="@string/folder_empty_repo_view"
