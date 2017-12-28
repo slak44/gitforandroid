@@ -19,14 +19,14 @@ import java.util.*
  * Representation of a repository that provides a wrapper over JGit's `Git` and `Repository` classes
  * @param name repository name in storage
  */
-class Repository(private val context: AppCompatActivity, name: String) {
+class Repository(private val context: Context, name: String) {
   companion object {
     /**
      * Fetch the parent directory for repositories.
      * @return a File object
      */
-    fun getRootDirectory(currentActivity: Context): File {
-      val f = File(currentActivity.getExternalFilesDir(null), "repositories")
+    fun getRootDirectory(context: Context): File {
+      val f = File(context.getExternalFilesDir(null), "repositories")
       f.mkdirs()
       return f
     }

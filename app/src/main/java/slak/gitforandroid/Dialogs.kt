@@ -3,7 +3,6 @@ package slak.gitforandroid
 import android.app.AlertDialog
 import android.content.Context
 import android.support.design.widget.Snackbar
-import android.support.v7.app.AppCompatActivity
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.*
@@ -12,18 +11,18 @@ import kotlinx.coroutines.experimental.android.UI
 import kotlinx.coroutines.experimental.launch
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider
 
-fun commitDialog(context: AppCompatActivity, target: Repository, snack: View): AlertDialog {
-  val dialogView: View = context.layoutInflater.inflate(R.layout.dialog_commit, null)
+fun commitDialog(context: Context, target: Repository, snack: View): AlertDialog {
+  val dialogView: View = LayoutInflater.from(context).inflate(R.layout.dialog_commit, null)
   val builder: AlertDialog.Builder = AlertDialog.Builder(context)
   builder
       .setTitle(R.string.dialog_commit_title)
       .setView(dialogView)
       .setPositiveButton(R.string.dialog_commit_confirm, null)
-      .setNegativeButton(R.string.dialog_commit_cancel) { dialog, which -> } // Auto dismiss
+      .setNegativeButton(R.string.dialog_commit_cancel) { _, _ -> } // Auto dismiss
   val dialog: AlertDialog = builder.create()
 
   val substitute = dialogView.findViewById(R.id.dialog_commit_substitute) as Switch
-  substitute.setOnCheckedChangeListener { btn: CompoundButton, isChecked: Boolean ->
+  substitute.setOnCheckedChangeListener { _, isChecked: Boolean ->
     val dataStatus = if (isChecked) View.VISIBLE else View.GONE
     dialogView.findViewById<TextView>(R.id.dialog_commit_name).visibility = dataStatus
     dialogView.findViewById<TextView>(R.id.dialog_commit_email).visibility = dataStatus
@@ -73,16 +72,13 @@ fun passwordDialog(context: Context, callback: (String) -> Unit): AlertDialog {
   return dialog
 }
 
-fun createRepoDialog(
-    context: AppCompatActivity,
-    snack: View,
-    onSuccess: (createdName: String) -> Unit = {}
-): AlertDialog {
+fun createRepoDialog(context: Context, snack: View,
+                     onSuccess: (createdName: String) -> Unit = {}): AlertDialog {
   val newRepo = AlertDialog.Builder(context)
-  val dialogView = context.layoutInflater.inflate(R.layout.dialog_add_repo, null)
+  val dialogView = LayoutInflater.from(context).inflate(R.layout.dialog_add_repo, null)
 
   val toClone = dialogView.findViewById(R.id.repo_add_dialog_clone) as Switch
-  toClone.setOnCheckedChangeListener { btn: CompoundButton, isChecked: Boolean ->
+  toClone.setOnCheckedChangeListener { _, isChecked: Boolean ->
     dialogView.findViewById<TextView>(R.id.repo_add_dialog_cloneURL).visibility =
         if (isChecked) View.VISIBLE else View.GONE
   }
@@ -146,12 +142,8 @@ enum class RemoteOp {
   PUSH, PULL
 }
 
-fun pushPullDialog(
-    context: AppCompatActivity,
-    snack: View,
-    target: Repository,
-    operation: RemoteOp
-): AlertDialog {
+fun pushPullDialog(context: Context, snack: View, target: Repository,
+                   operation: RemoteOp): AlertDialog {
   val titleRes = when (operation) {
     RemoteOp.PUSH -> R.string.dialog_push_pull_title_push
     RemoteOp.PULL -> R.string.dialog_push_pull_title_pull
@@ -169,13 +161,13 @@ fun pushPullDialog(
     RemoteOp.PULL -> R.string.error_pull_failed
   }
 
-  val dialogView: View = context.layoutInflater.inflate(R.layout.dialog_push_pull, null)
+  val dialogView: View = LayoutInflater.from(context).inflate(R.layout.dialog_push_pull, null)
   val builder: AlertDialog.Builder = AlertDialog.Builder(context)
   builder
       .setTitle(titleRes)
       .setView(dialogView)
       .setPositiveButton(confirmRes, null)
-      .setNegativeButton(R.string.dialog_push_pull_cancel) { dialog, which -> } // Auto dismiss
+      .setNegativeButton(R.string.dialog_push_pull_cancel) { _, _ -> } // Dismiss
   val dialog: AlertDialog = builder.create()
 
   val manualRemote = dialogView.findViewById(R.id.dialog_push_pull_switch_remote) as Switch
